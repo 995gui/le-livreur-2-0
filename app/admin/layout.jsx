@@ -6,7 +6,7 @@ import AdminNavbar from '@/components/admin/AdminNavbar';
 
 export default async function AdminLayout({ children }) {
   const cookieStore = await cookies();
-  
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
@@ -21,16 +21,17 @@ export default async function AdminLayout({ children }) {
   const { data: { user }, error } = await supabase.auth.getUser();
 
   if (error || !user) {
-    redirect('/login?message=Accès réservé. Veuillez vous connecter.');
+    // --- CORRECTION ICI ---
+    // On encode le message pour que les accents (è, é) passent sur Vercel
+    const message = encodeURIComponent("Accès réservé. Veuillez vous connecter.");
+    redirect(`/login?message=${message}`);
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50/50">
       <AdminNavbar />
-      
-      {/* Zone de contenu avec marges pour top bar et sidebar */}
-      <main className="pt-14 lg:pl-64 pb-20 lg:pb-6">
-        <div className="px-4 sm:px-6 lg:px-8 py-8">
+      <main className="pt-14 lg:pl-64 pb-20 lg:pb-10 transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
           {children}
         </div>
       </main>
