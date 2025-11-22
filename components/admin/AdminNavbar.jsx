@@ -1,7 +1,7 @@
-// Fichier: components/admin/AdminNavbar.jsx - VERSION FINALE OPTIMISÉE
+// Fichier: components/admin/AdminNavbar.jsx
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
@@ -9,16 +9,20 @@ import {
   LayoutDashboard, Users, FileText, MessageSquare, 
   Settings, LogOut, Menu, X, ChevronRight,
   Image as ImageIcon, Handshake, Map as MapIcon,
-  Bell, ChevronDown
+  Bell, ChevronDown, ExternalLink
 } from 'lucide-react';
 
 export default function AdminNavbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Ajouté pour cohérence si utilisé
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [counts, setCounts] = useState({ devis: 0, candidatures: 0, contacts: 0 });
+  
+  const sidebarRef = useRef(null);
+  const userMenuRef = useRef(null);
 
   const supabase = useMemo(
     () => createBrowserClient(
@@ -67,6 +71,21 @@ export default function AdminNavbar() {
     }
   };
 
+  // Fermeture au clic dehors
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        setIsSidebarOpen(false);
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const navigation = [
     { name: 'Vue d\'ensemble', href: '/admin', icon: LayoutDashboard },
     { name: 'Hero Slides', href: '/admin/hero-slides', icon: ImageIcon },
@@ -81,7 +100,104 @@ export default function AdminNavbar() {
 
   return (
     <>
-      {/* ========== SIDEBAR DESKTOP (Fixe à gauche) ========== */}
+      {/* Top Bar */}
+      <header className="fixed top-0 left-0 right-0 h-14 bg-white/80 backdrop-blur-xl border-b border-gray-200/80 z-50">
+        <div className="h-full px-4 flex items-center justify-between">
+          {/* Left Section */}
+          <div className="flex items-center space-x-4">
+            {/* Sidebar Toggle - Desktop */}
+            <button 
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <Menu className="w-5 h-5 text-gray-600" />
+            </button>
+
+            {/* Logo */}
+            <Link href="/admin" className="flex items-center space-x-2 group">
+              <div className="w-8 h-8 bg-gradient-to-br from-[#1B3A5F] via-[#2C5282] to-[#F4B223] rounded-lg flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
+                <span className="text-sm font-bold text-white">A</span>
+              </div>
+              <span className="hidden sm:block text-sm font-semibold text-gray-900">Admin Panel</span>
+            </Link>
+          </div>
+
+          {/* Right Section */}
+          <div className="flex items-center space-x-2">
+            
+            {/* --- 1. BOUTON VOIR LE SITE (Desktop) --- */}
+            <Link 
+              href="/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hidden sm:flex items-center space-x-2 px-3 py-1.5 bg-gray-50 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-[#1B3A5F] transition-colors text-xs font-bold mr-2"
+              title="Ouvrir le site dans un nouvel onglet"
+            >
+              <ExternalLink className="w-3 h-3" />
+              <span>Voir le site</span>
+            </Link>
+            {/* --------------------------------------- */}
+
+            {/* Notifications */}
+            <button className="hidden sm:flex p-2 hover:bg-gray-100 rounded-lg transition-colors relative">
+              <Bell className="w-5 h-5 text-gray-600" />
+              {totalNotifications > 0 && (
+                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
+              )}
+            </button>
+
+            {/* Settings */}
+            <button className="hidden sm:flex p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <Settings className="w-5 h-5 text-gray-600" />
+            </button>
+
+            {/* User Menu */}
+            <div className="relative" ref={userMenuRef}>
+              <button 
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center space-x-2 p-1.5 pr-3 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <div className="w-8 h-8 bg-gradient-to-br from-[#F4B223] to-[#1B3A5F] rounded-full flex items-center justify-center">
+                  <span className="text-xs font-semibold text-white">AD</span>
+                </div>
+                <ChevronDown className="w-4 h-4 text-gray-500 hidden sm:block" />
+              </button>
+
+              {/* Dropdown Menu */}
+              {showUserMenu && (
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-semibold text-gray-900">Administrateur</p>
+                    <p className="text-xs text-gray-500">admin@lelivreur2.bj</p>
+                  </div>
+                  
+                  {/* --- 2. LIEN VOIR LE SITE (Mobile) --- */}
+                  <Link 
+                    href="/" 
+                    target="_blank" 
+                    className="w-full flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors sm:hidden"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    <span>Voir le site</span>
+                  </Link>
+                  {/* ------------------------------------- */}
+
+                  <button
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    className="w-full flex items-center space-x-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>{isLoggingOut ? 'Déconnexion...' : 'Se déconnecter'}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Sidebar - Desktop */}
       <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col bg-gradient-to-b from-[#1B3A5F] to-[#2C5282] z-50">
         <div className="flex flex-col flex-1 min-h-0">
           {/* Logo + Search */}
@@ -96,7 +212,7 @@ export default function AdminNavbar() {
               </div>
             </Link>
 
-            {/* Search Bar Desktop */}
+            {/* Search Bar Desktop Sidebar */}
             <div className="relative">
               <input
                 type="text"
@@ -140,7 +256,7 @@ export default function AdminNavbar() {
             })}
           </nav>
 
-          {/* User + Notifications Desktop */}
+          {/* User + Notifications Desktop Sidebar */}
           <div className="flex-shrink-0 border-t border-white/10 p-4 space-y-3">
             {/* Notifications */}
             {totalNotifications > 0 && (
@@ -172,128 +288,39 @@ export default function AdminNavbar() {
         </div>
       </aside>
 
-      {/* ========== TOP BAR MOBILE (Sans spacer !) ========== */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b shadow-sm">
-        <div className="flex items-center justify-between px-4 h-14">
-          {/* Logo Mobile */}
-          <Link href="/admin" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-[#F4B223] rounded-lg flex items-center justify-center">
-              <span className="text-[#1B3A5F] font-bold">L</span>
-            </div>
-            <span className="text-[#1B3A5F] font-bold text-sm">ADMIN</span>
-          </Link>
-
-          {/* Actions Mobile */}
-          <div className="flex items-center gap-2">
-            {/* Notification Bell */}
-            {totalNotifications > 0 && (
-              <button className="relative p-2 hover:bg-gray-100 rounded-lg">
-                <Bell className="w-5 h-5 text-gray-600" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+      {/* ========== MOBILE SIDEBAR OVERLAY ========== */}
+      {isSidebarOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex">
+          <div className="fixed inset-0 bg-black/50 transition-opacity" onClick={() => setIsSidebarOpen(false)} />
+          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-[#1B3A5F] animate-in slide-in-from-left duration-300">
+            <div className="absolute top-0 right-0 -mr-12 pt-2">
+              <button onClick={() => setIsSidebarOpen(false)} className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                <X className="h-6 w-6 text-white" />
               </button>
-            )}
-
-            {/* Menu Burger */}
-            <button
-              onClick={() => setIsMobileMenuOpen(true)}
-              className="p-2 hover:bg-gray-100 rounded-lg"
-            >
-              <Menu className="w-6 h-6 text-[#1B3A5F]" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* ========== MENU MOBILE FULLSCREEN ========== */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm animate-in fade-in">
-          <div className="absolute inset-y-0 right-0 w-full max-w-sm bg-gradient-to-b from-[#1B3A5F] to-[#2C5282] shadow-2xl animate-in slide-in-from-right">
-            <div className="flex flex-col h-full">
-              {/* Header Menu Mobile */}
-              <div className="flex items-center justify-between h-14 px-4 border-b border-white/10">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-[#F4B223] rounded-lg flex items-center justify-center">
-                    <span className="text-[#1B3A5F] font-bold">L</span>
-                  </div>
-                  <div>
-                    <h2 className="text-white font-bold text-sm">LIVREUR 2.0</h2>
-                    <p className="text-blue-200 text-xs">Administration</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-2 rounded-lg hover:bg-white/10"
-                >
-                  <X className="w-6 h-6 text-white" />
-                </button>
+            </div>
+            
+            {/* Contenu Sidebar Mobile (Copie de la desktop pour simplifier) */}
+            <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
+              <div className="flex-shrink-0 flex items-center px-4 text-white font-bold text-xl">
+                ADMIN PANEL
               </div>
-
-              {/* Navigation Mobile */}
-              <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-                {navigation.map((item) => {
-                  const isActive = pathname === item.href || (item.href !== '/admin' && pathname?.startsWith(item.href));
-                  const Icon = item.icon;
-                  
-                  return (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className={`flex items-center justify-between px-4 py-3 rounded-lg font-medium transition-all ${
-                        isActive
-                          ? 'bg-white/10 text-white shadow-lg'
-                          : 'text-blue-100 hover:bg-white/5 hover:text-white active:scale-95'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Icon className="w-5 h-5 flex-shrink-0" />
-                        <span>{item.name}</span>
-                      </div>
-                      {item.count > 0 && (
-                        <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                          {item.count}
-                        </span>
-                      )}
-                    </Link>
-                  );
-                })}
+              <nav className="mt-5 px-2 space-y-1">
+                {navigation.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    onClick={() => setIsSidebarOpen(false)}
+                    className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-white hover:bg-white/10"
+                  >
+                    <item.icon className="mr-4 flex-shrink-0 h-6 w-6 text-blue-200" />
+                    {item.name}
+                  </Link>
+                ))}
               </nav>
-
-              {/* Footer Menu Mobile */}
-              <div className="border-t border-white/10 p-4 space-y-3">
-                {/* Notifications Mobile */}
-                {totalNotifications > 0 && (
-                  <div className="bg-white/10 rounded-lg p-3 flex items-center gap-3">
-                    <Bell className="w-5 h-5 text-[#F4B223]" />
-                    <div>
-                      <p className="text-xs text-blue-200">Notifications</p>
-                      <p className="text-sm font-bold text-white">{totalNotifications} nouvelle(s)</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* User Info Mobile */}
-                <div className="bg-white/10 rounded-lg p-3">
-                  <p className="text-xs text-blue-200 mb-1">Connecté</p>
-                  <p className="text-sm font-semibold text-white">Administrateur</p>
-                </div>
-
-                {/* Logout Mobile */}
-                <button
-                  onClick={handleLogout}
-                  disabled={isLoggingOut}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-white rounded-lg transition-colors disabled:opacity-50"
-                >
-                  <LogOut className="w-5 h-5" />
-                  <span>{isLoggingOut ? 'Déconnexion...' : 'Se déconnecter'}</span>
-                </button>
-              </div>
             </div>
           </div>
         </div>
       )}
-
-      {/* ❌ PAS DE SPACERS ! Chaque page gère son espacement */}
     </>
   );
 }
