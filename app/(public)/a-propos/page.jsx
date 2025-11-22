@@ -231,13 +231,7 @@ export default function AProposPage() {
                     </p>
                   </div>
                </div>
-               {/* Décommenter quand l'image est disponible */}
-               {/* <Image src="/images/about-hero.jpg" alt="Équipe LE LIVREUR 2.0" fill className="object-cover group-hover:scale-105 transition-transform duration-500" /> */}
-               
-               {/* Badge flottant */}
-               <div className="absolute top-6 right-6 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg">
-                 <p className="text-sm font-bold text-[#1B3A5F]">⭐ 4.9/5 - 200+ avis</p>
-               </div>
+               <Image src="/about-hero.jpg" alt="Équipe LE LIVREUR 2.0" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
             </div>
           </div>
         </div>

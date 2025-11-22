@@ -91,7 +91,7 @@ export default function PartnersAdmin() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="p-4 md:p-8 max-w-7xl mx-auto sm:py-20 md:pb-8">
       <h1 className="text-3xl font-bold text-[#1B3A5F] mb-8">Gestion des Partenaires</h1>
 
       {/* Formulaire d'ajout (Carte en haut) */}

@@ -75,7 +75,7 @@ export default function DevisPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="p-4 md:p-8 max-w-7xl mx-auto sm:py-20 md:pb-8">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold text-[#1B3A5F]">Gestion des Devis</h1>

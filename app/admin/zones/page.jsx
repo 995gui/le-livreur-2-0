@@ -71,7 +71,7 @@ export default function ZonesAdmin() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4">
+    <div className="p-4 md:p-8 max-w-7xl mx-auto sm:py-20 md:pb-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-[#1B3A5F]">Gestion des Zones</h1>
         <button 
