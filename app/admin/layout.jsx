@@ -23,7 +23,7 @@ export default async function AdminLayout({ children }) {
   if (error || !user) {
     // --- CORRECTION ICI ---
     // On encode le message pour que les accents (è, é) passent sur Vercel
-    const message = encodeURIComponent("Accès réservé. Veuillez vous connecter.");
+    const message = encodeURIComponent("Accès réservé. Veuillez vous connecter ok.");
     redirect(`/login?message=${message}`);
   }
 
