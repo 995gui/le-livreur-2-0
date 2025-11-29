@@ -7,9 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Loader2, Upload, CheckCircle } from 'lucide-react';
 
-export default function RecrutementForm() {
+export default function RecrutementForm({ open, onOpenChange, isModal = true }) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -17,7 +24,6 @@ export default function RecrutementForm() {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validation de la taille (5MB max)
       if (file.size > 5 * 1024 * 1024) {
         toast({
           variant: "destructive",
@@ -29,7 +35,6 @@ export default function RecrutementForm() {
         return;
       }
 
-      // Validation du type
       const allowedTypes = [
         'application/pdf',
         'application/msword',
@@ -56,10 +61,8 @@ export default function RecrutementForm() {
     setIsSubmitting(true);
 
     try {
-      // Récupération des données du formulaire
       const formData = new FormData(e.target);
 
-      // Validation côté client
       const phone = formData.get('phone');
       const phoneRegex = /^(\+229)?[0-9]{8,10}$/;
       
@@ -73,7 +76,6 @@ export default function RecrutementForm() {
         return;
       }
 
-      // Envoi vers l'API
       const response = await fetch('/api/recrutement', {
         method: 'POST',
         body: formData,
@@ -82,18 +84,17 @@ export default function RecrutementForm() {
       const result = await response.json();
 
       if (result.success) {
-        // Toast de succès
         toast({
           title: "Candidature envoyée ! ✅",
           description: result.message,
           duration: 6000,
         });
 
-        // Réinitialisation du formulaire
         e.target.reset();
         setSelectedFile(null);
+        
+        if (isModal && onOpenChange) onOpenChange(false);
 
-        // Animation de succès (optionnel)
         setTimeout(() => {
           toast({
             title: "Prochaine étape",
@@ -102,7 +103,6 @@ export default function RecrutementForm() {
         }, 3000);
 
       } else {
-        // Toast d'erreur
         toast({
           variant: "destructive",
           title: "Erreur",
@@ -122,9 +122,8 @@ export default function RecrutementForm() {
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Nom complet */}
+  const FormContent = () => (
+    <div className="space-y-6">
       <div className="grid w-full items-center gap-2">
         <Label htmlFor="name" className="text-base font-semibold">
           Nom complet <span className="text-red-500">*</span>
@@ -140,7 +139,6 @@ export default function RecrutementForm() {
         />
       </div>
 
-      {/* Téléphone */}
       <div className="grid w-full items-center gap-2">
         <Label htmlFor="phone" className="text-base font-semibold">
           Numéro de téléphone <span className="text-red-500">*</span>
@@ -159,7 +157,6 @@ export default function RecrutementForm() {
         </p>
       </div>
 
-      {/* Email */}
       <div className="grid w-full items-center gap-2">
         <Label htmlFor="email" className="text-base font-semibold">
           Adresse e-mail <span className="text-gray-400">(optionnel)</span>
@@ -174,7 +171,6 @@ export default function RecrutementForm() {
         />
       </div>
 
-      {/* Motivation */}
       <div className="grid w-full gap-2">
         <Label htmlFor="motivation" className="text-base font-semibold">
           Pourquoi voulez-vous nous rejoindre ? <span className="text-red-500">*</span>
@@ -193,7 +189,6 @@ export default function RecrutementForm() {
         </p>
       </div>
 
-      {/* CV Upload */}
       <div className="grid w-full items-center gap-2">
         <Label htmlFor="cv" className="text-base font-semibold">
           Votre CV <span className="text-red-500">*</span>
@@ -221,7 +216,6 @@ export default function RecrutementForm() {
         </p>
       </div>
 
-      {/* Submit Button */}
       <Button
         type="submit"
         disabled={isSubmitting}
@@ -240,12 +234,40 @@ export default function RecrutementForm() {
         )}
       </Button>
 
-      {/* Note de confidentialité */}
       <div className="text-xs text-gray-500 text-center leading-relaxed">
         En soumettant ce formulaire, vous acceptez que vos données soient 
         utilisées dans le cadre du processus de recrutement conformément à 
         notre politique de confidentialité.
       </div>
-    </form>
+    </div>
+  );
+
+  // Si isModal = false, afficher directement le formulaire
+  if (!isModal) {
+    return (
+      <form onSubmit={handleSubmit}>
+        <FormContent />
+      </form>
+    );
+  }
+
+  // Si isModal = true, afficher dans un Dialog
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold text-[#1B3A5F]">
+            Rejoignez Notre Équipe
+          </DialogTitle>
+          <DialogDescription>
+            Remplissez le formulaire ci-dessous pour postuler
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="py-4">
+          <FormContent />
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

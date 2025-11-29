@@ -1,11 +1,15 @@
 // Fichier: components/sections/home/Cta.jsx
+'use client';
+import { useState, useEffect } from 'react';
 import { Phone, MessageCircle, Mail, MapPin, Clock, Send } from 'lucide-react';
+import DevisForm from '@/components/forms/DevisForm';
 
 export default function Cta() {
   // VOS VRAIES COORDONNÉES
-  const phoneNumber = "+229 00 00 00 00"; // ⚠️ REMPLACEZ CECI PAR VOTRE VRAI NUMÉRO
-  const whatsappNumber = "22900000000"; // ⚠️ FORMAT SANS LE '+' NI ESPACES
+  const phoneNumber = "+229 01 47 04 28 15"; // ⚠️ REMPLACEZ CECI PAR VOTRE VRAI NUMÉRO
+  const whatsappNumber = "2290147042815"; // ⚠️ FORMAT SANS LE '+' NI ESPACES
   const email = "lelivreur2zero@gmail.com";
+  const [isDevisModalOpen, setIsDevisModalOpen] = useState(false);
 
   const contactMethods = [
     {
@@ -152,13 +156,13 @@ export default function Cta() {
               Pour vos besoins réguliers ou spécifiques, obtenez une proposition adaptée sous 24h.
             </p>
             
-            <a 
-              href="/tarifs#devis" 
+            <button 
+              onClick={() => setIsDevisModalOpen(true)}
               className="w-full bg-[#F4B223] text-[#1B3A5F] py-4 rounded-lg font-bold text-lg hover:bg-[#D4920F] transition-all transform hover:scale-105 shadow-lg flex items-center justify-center group"
             >
               Obtenir un devis gratuit
               <Send className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </a>
+            </button>
 
             <p className="text-xs text-gray-500 text-center mt-6 flex items-center justify-center">
               <Clock className="w-3 h-3 mr-1" />
@@ -167,6 +171,7 @@ export default function Cta() {
           </div>
         </div>
       </div>
+      <DevisForm open={isDevisModalOpen} onOpenChange={setIsDevisModalOpen} />
     </section>
   );
 }

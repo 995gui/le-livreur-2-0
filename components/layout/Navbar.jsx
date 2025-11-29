@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Menu, X, Phone, ChevronDown, MessageCircle } from 'lucide-react';
+import DevisForm from '@/components/forms/DevisForm';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,6 +14,7 @@ export default function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState(null);
   // État spécifique pour le menu mobile (accordéon)
   const [expandedMobile, setExpandedMobile] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const pathname = usePathname();
 
@@ -55,16 +57,17 @@ export default function Navbar() {
         { name: 'Livraison Groupée', href: '/services#groupee', icon: '📦', description: 'E-commerce & Stockage' },
         { name: 'Service Corporate', href: '/services#corporate', icon: '💼', description: 'Solutions Entreprises' },
         { name: 'Abonnements', href: '/services#abonnements', icon: '⭐', description: 'Tarifs préférentiels' },
+        { name: 'Expédition Cotonou ↔ Lomé', href: '/services#expedition-lome', icon: '🌍', description: 'Service transfrontalier' },
       ]
     },
     { name: 'Tarifs', href: '/tarifs', icon: '💰' },
-    { name: 'Zone de Couverture', href: '/zone-de-couverture', icon: '🗺️' },
     {
       name: 'Entreprise',
       href: '#',
       icon: '🏢',
       dropdown: [
         { name: 'À propos', href: '/a-propos', icon: '📖', description: 'Notre histoire' },
+        { name: 'Zone de Couverture', href: '/zone-de-couverture', icon: '🗺️', description: 'Nos zones de livraison' },
         { name: 'Recrutement Livreurs', href: '/recrutement', icon: '🏍️', description: 'Rejoignez-nous' },
       ]
     },
@@ -186,12 +189,12 @@ export default function Navbar() {
               <span className="hidden xl:inline">{companyInfo.phone}</span>
             </a>
             
-            <Link
-              href="/contact"
+            <button
+              onClick={() => setIsModalOpen(true)} 
               className="bg-[#F4B223] text-[#1B3A5F] px-6 py-2 rounded-lg font-bold hover:bg-[#D4920F] transition-all transform hover:scale-105 shadow-lg"
             >
               Commander
-            </Link>
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -304,6 +307,7 @@ export default function Navbar() {
            </div>
         </div>
       )}
+      <DevisForm open={isModalOpen} onOpenChange={setIsModalOpen} />
     </header>
   );
 }

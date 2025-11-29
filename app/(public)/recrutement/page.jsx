@@ -51,8 +51,8 @@ export default function RecrutementPage() {
     'Avoir minimum 18 ans',
     'Posséder un permis de conduire valide (catégorie A)',
     'Savoir lire et écrire le français',
-    'Avoir une bonne connaissance de Cotonou',
-    'Être disponible au moins 4 jours par semaine',
+    'Avoir une bonne connaissance de Cotonou, Abomey-Calavi et environs',
+    'Être entièrement disponible',
     'Posséder un smartphone (Android ou iOS)',
     'Avoir un casier judiciaire vierge',
     'Être en bonne condition physique'
@@ -201,14 +201,14 @@ export default function RecrutementPage() {
               <div className="space-y-6">
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-[#F4B223]">
                   <h4 className="font-bold text-[#F4B223] mb-2">Salaire de Base</h4>
-                  <p className="text-3xl font-bold mb-2">50 000 - 80 000 FCFA</p>
+                  <p className="text-3xl font-bold mb-2">SMIG en vigueur</p>
                   <p className="text-sm opacity-90">+ Primes de performance</p>
                 </div>
                 
                 <div className="space-y-3 text-sm">
                   <div className="flex items-start space-x-2">
                     <CheckCircle className="w-5 h-5 text-[#F4B223] flex-shrink-0 mt-0.5" />
-                    <span>Prime de rendement jusqu'à 30 000 FCFA/mois</span>
+                    <span>Prime de rendement</span>
                   </div>
                   <div className="flex items-start space-x-2">
                     <CheckCircle className="w-5 h-5 text-[#F4B223] flex-shrink-0 mt-0.5" />
@@ -325,7 +325,7 @@ export default function RecrutementPage() {
               </p>
             </div>
 
-            <RecrutementForm />
+            <RecrutementForm isModal={false} />
 
             <div className="mt-8 p-6 bg-blue-50 rounded-xl border border-blue-200">
               <p className="text-sm text-gray-700 leading-relaxed">
@@ -357,7 +357,7 @@ export default function RecrutementPage() {
               },
               {
                 q: 'Puis-je travailler en temps partiel ?',
-                a: 'Oui ! Nous proposons des contrats flexibles. Vous devez être disponible au minimum 4 jours par semaine.'
+                a: 'Oui ! Nous proposons des contrats flexibles.'
               },
               {
                 q: 'Quand puis-je commencer après ma candidature ?',

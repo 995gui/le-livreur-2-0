@@ -1,23 +1,25 @@
 // Fichier: app/services/page.jsx
-import Link from 'next/link';
-import { Zap, Clock, Leaf, Package, Building2, TrendingUp, Check, ArrowRight, Phone, MessageCircle } from 'lucide-react';
+'use client';
 
-export const metadata = {
-  title: 'Services de Livraison à Cotonou | LE LIVREUR 2.0',
-  description: 'Livraison express, programmée, écologique et corporate à Cotonou. Solutions professionnelles pour particuliers et entreprises au Bénin.',
-};
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import DevisForm from '@/components/forms/DevisForm';
+import ContactForm from '@/components/forms/ContactForm';
+import { Zap, Clock, Leaf, Package, Building2, TrendingUp, Check, ArrowRight, Phone, MessageCircle, Globe, MapPin, Truck, Shield } from 'lucide-react';
 
 export default function ServicesPage() {
   // VOS VRAIES COORDONNÉES
-  const phoneNumber = "+229 00 00 00 00"; // REMPLACEZ PAR LE VRAI
-  const whatsappNumber = "22900000000";   // REMPLACEZ PAR LE VRAI
+  const phoneNumber = "+2290147042815"; // REMPLACEZ PAR LE VRAI
+  const whatsappNumber = "2290147042815";   // REMPLACEZ PAR LE VRAI
+  const [isDevisModalOpen, setIsDevisModalOpen] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   
   const services = [
     {
       id: 'express',
       icon: <Zap className="w-12 h-12" />,
       title: 'Livraison Express',
-      subtitle: 'Urgence & Nuit & Week-end',
+      subtitle: 'Disponibilité en soirée, week-ends & jours fériés',
       description: 'Votre colis est prioritaire. Un livreur est dépêché immédiatement pour une course directe sans détours.',
       longDescription: 'Le service Express est conçu pour les urgences absolues, les livraisons de nuit ou les week-ends. Votre commande passe avant toutes les autres avec une prise en charge immédiate.',
       advantages: [
@@ -35,7 +37,6 @@ export default function ServicesPage() {
         'Cadeaux dernière minute',
         'Oublis de clés ou documents'
       ],
-      // MISE À JOUR SELON L'IMAGE : +50% sur tarif standard
       pricing: 'Majoration +50% sur tarif standard', 
       color: 'from-blue-500 to-blue-700',
       bgColor: 'bg-blue-50'
@@ -43,14 +44,14 @@ export default function ServicesPage() {
     {
       id: 'programmee',
       icon: <Clock className="w-12 h-12" />,
-      title: 'Livraison Standard / Programmée',
+      title: 'Livraison Standard / Programmée et/ou Groupée',
       subtitle: 'Le choix malin et économique',
       description: 'La solution idéale pour vos livraisons quotidiennes non-urgentes. Planifiez à l\'avance et bénéficiez des meilleurs tarifs.',
-      longDescription: 'Notre service standard couvre tout Cotonou et Calavi. En planifiant vos courses ou en acceptant un délai standard, vous optimisez vos coûts logistiques.',
+      longDescription: 'Notre service standard couvre tout Cotonou, Abomey-Calavi et environs. En planifiant vos courses ou en acceptant un délai standard, vous optimisez vos coûts logistiques.',
       advantages: [
         'Le tarif le plus économique du marché',
         'Créneaux horaires respectés',
-        'Couverture Cotonou & Calavi',
+        'Couverture Cotonou, Abomey-Calavi et environs',
         'Fiabilité et soin des colis',
         'Notifications à l\'enlèvement et livraison',
         'Idéal pour e-commerce classique'
@@ -62,7 +63,6 @@ export default function ServicesPage() {
         'Retours de marchandises',
         'Cadeaux planifiés'
       ],
-      // MISE À JOUR SELON L'IMAGE : Départ à 700F
       pricing: 'À partir de 700 FCFA',
       color: 'from-purple-500 to-purple-700',
       bgColor: 'bg-purple-50'
@@ -73,14 +73,14 @@ export default function ServicesPage() {
       title: 'Livraison Écologique',
       subtitle: 'Motos électriques silencieuses',
       description: 'Faites livrer vos colis sans polluer. Notre flotte de motos électriques réduit l\'empreinte carbone de chaque course.',
-      longDescription: 'LE LIVREUR 2.0 est pionnier dans la logistique verte au Bénin. Nos motos électriques sont silencieuses et n\'émettent aucun gaz d\'échappement, idéales pour les zones résidentielles.',
+      longDescription: 'LE LIVREUR 2.0 est pionnier dans la logistique verte du dernier kilomètre au Bénin. Nos motos électriques sont silencieuses et n\'émettent aucun gaz d\'échappement, idéales pour les zones résidentielles.',
       advantages: [
         'Zéro émission de CO2',
         'Zéro pollution sonore (Silencieux)',
         'Image de marque positive pour vous',
         'Accès facilité aux zones résidentielles',
         'Même efficacité que les motos thermiques',
-        'Contribution à un Cotonou plus vert'
+        'Contribution à une ville plus Verte'
       ],
       useCases: [
         'Marques éthiques et bio',
@@ -89,7 +89,7 @@ export default function ServicesPage() {
         'Zones hospitalières ou calmes',
         'Clients sensibles à l\'écologie'
       ],
-      pricing: 'Même prix que le standard', // Argument fort
+      pricing: 'Même prix que le standard',
       color: 'from-green-500 to-green-700',
       bgColor: 'bg-green-50'
     },
@@ -98,7 +98,7 @@ export default function ServicesPage() {
       icon: <Package className="w-12 h-12" />,
       title: 'Livraison Groupée & Stockage',
       subtitle: 'La solution E-commerçants',
-      description: 'Nous stockons, nous emballons, nous livrons. Une logistique complète pour les vendeurs en ligne qui veulent se libérer du stress.',
+      description: 'Nous stockons, emballons & livrons. Une logistique complète pour les vendeurs en ligne hors du Bénin ou Cotonou/Abomey-Calvi qui veulent se libérer du stress tout en augmentant leurs ventes.',
       longDescription: 'Confiez-nous votre stock tampon. Dès que vous recevez une commande, nous préparons le colis (closing) et l\'expédions. Les livraisons groupées permettent de réduire drastiquement vos coûts.',
       advantages: [
         'Stockage sécurisé dans nos locaux',
@@ -124,7 +124,7 @@ export default function ServicesPage() {
       icon: <Building2 className="w-12 h-12" />,
       title: 'Offre Corporate / Entreprise',
       subtitle: 'Votre coursier dédié',
-      description: 'Un service premium pour les entreprises qui ont besoin de fiabilité absolue : facturation fin de mois, courses administratives, et confidentialité.',
+      description: 'Un service premium pour les entreprises qui ont besoin de fiabilité absolue : facturation mensuelle, courses administratives, et confidentialité.',
       longDescription: 'Fini la petite caisse pour payer chaque course. Avec l\'offre Corporate, vous avez un compte entreprise, une facturation mensuelle claire et des livreurs formés aux codes de l\'entreprise (tenue, langage, confidentialité).',
       advantages: [
         'Facturation mensuelle unique',
@@ -141,7 +141,6 @@ export default function ServicesPage() {
         'PME avec flux régulier',
         'Pharmacies et laboratoires'
       ],
-      // MISE À JOUR SELON L'IMAGE
       pricing: 'Accompagnement personnalisé', 
       color: 'from-indigo-500 to-indigo-700',
       bgColor: 'bg-indigo-50'
@@ -197,13 +196,13 @@ export default function ServicesPage() {
               Nos Solutions
             </span>
             <h1 className="text-4xl md:text-6xl font-bold mt-2 mb-6 leading-tight">
-              Services de Livraison Professionnels
+              Service de Livraison Professionnel
             </h1>
             <p className="text-lg md:text-xl opacity-90 leading-relaxed">
-              Du particulier à l'entreprise, découvrez nos solutions de <strong>livraison express</strong>, 
+              Des particuliers aux entreprises, découvrez nos solutions de <strong>livraison express</strong>, 
               <strong> programmée</strong> et <strong>corporate</strong>. 
               <br/>
-              Tarifs clairs à partir de <strong className="text-[#F4B223]">700 FCFA</strong>.
+              Tarification transparente dès <strong className="text-[#F4B223]">700 FCFA</strong>.
             </p>
           </div>
         </div>
@@ -274,13 +273,13 @@ export default function ServicesPage() {
                       </div>
 
                       <div className="flex flex-col sm:flex-row gap-4">
-                        <Link
-                          href="/tarifs#devis"
+                        <button
+                          onClick={() => setIsDevisModalOpen(true)}
                           className="inline-flex items-center justify-center bg-[#F4B223] text-[#1B3A5F] px-6 py-3 rounded-lg font-bold hover:bg-[#D4920F] transition-all shadow-lg hover:shadow-xl"
                         >
                           Obtenir un devis
                           <ArrowRight className="ml-2 w-5 h-5" />
-                        </Link>
+                        </button>
                         <Link
                           href="/contact"
                           className="inline-flex items-center justify-center border-2 border-[#1B3A5F] text-[#1B3A5F] px-6 py-3 rounded-lg font-bold hover:bg-[#1B3A5F] hover:text-white transition-all"
@@ -294,6 +293,205 @@ export default function ServicesPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* NOUVEAU SERVICE : EXPÉDITION COTONOU ↔ LOMÉ */}
+      <section id="expedition-lome" className="py-20 bg-gradient-to-br from-[#1B3A5F] via-[#2C5282] to-[#1B3A5F] text-white relative overflow-hidden">
+        {/* Éléments décoratifs */}
+        <div className="absolute top-0 left-0 w-96 h-96 bg-[#F4B223] rounded-full opacity-10 blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#F4B223] rounded-full opacity-10 blur-3xl translate-x-1/2 translate-y-1/2"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          
+          {/* Header */}
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-[#F4B223]/20 text-[#F4B223] px-6 py-2 rounded-full text-sm font-bold mb-6 border border-[#F4B223]/30">
+              <Globe className="w-5 h-5" /> Service International
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Expédition Cotonou ↔ Lomé
+            </h2>
+            <p className="text-xl md:text-2xl opacity-90 max-w-3xl mx-auto leading-relaxed">
+              Expédiez vos colis en toute confiance avec <strong className="text-[#F4B223]">LE LIVREUR 2.0</strong>
+            </p>
+          </div>
+
+          {/* Description principale */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 md:p-12 mb-16 border border-white/20">
+            <p className="text-lg md:text-xl leading-relaxed text-center text-white/90">
+              Notre service d'expédition transfrontalier entre <strong>Cotonou (Bénin)</strong> et <strong>Lomé (Togo)</strong> garantit 
+              <strong className="text-[#F4B223]"> rapidité, sécurité et transparence totale</strong>. Grâce à nos départs réguliers, notre équipe professionnelle 
+              et une logistique parfaitement structurée, vos colis arrivent à destination sans stress, en toute sécurité et dans les délais annoncés.
+            </p>
+          </div>
+
+          {/* Grille des avantages */}
+          <div className="mb-16">
+            <h3 className="text-3xl font-bold text-center mb-12">Nos Avantages</h3>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                {
+                  icon: <Clock className="w-8 h-8" />,
+                  title: 'Départs réguliers',
+                  description: 'Expéditions fréquentes dans les deux sens pour des délais réduits et un flux logistique continu.'
+                },
+                {
+                  icon: <MapPin className="w-8 h-8" />,
+                  title: 'Suivi en temps réel',
+                  description: 'Notifications à chaque étape : collecte, transit, arrivée et livraison finale.'
+                },
+                {
+                  icon: <Shield className="w-8 h-8" />,
+                  title: 'Livraison sécurisée (0,1 à 50 kg)',
+                  description: 'Colis scellés, vérifiés et manipulés avec soin pour une sécurité maximale.'
+                },
+                {
+                  icon: <Truck className="w-8 h-8" />,
+                  title: 'Collecte & ramassage',
+                  description: 'Passages chaque Mardi et Jeudi, à domicile, en boutique ou en entrepôt.'
+                },
+                {
+                  icon: <Check className="w-8 h-8" />,
+                  title: 'Paiement simple',
+                  description: 'Règlement à la collecte ou au ramassage, selon votre convenance.'
+                },
+                {
+                  icon: <Package className="w-8 h-8" />,
+                  title: 'Livraison directe',
+                  description: 'Livraison du colis à domicile ou en point relais selon la localisation du destinataire.'
+                }
+              ].map((adv, idx) => (
+                <div key={idx} className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-[#F4B223] rounded-full mb-4">
+                    {adv.icon}
+                  </div>
+                  <h4 className="font-bold text-lg mb-2">{adv.title}</h4>
+                  <p className="text-white/80 text-sm leading-relaxed">{adv.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Option Sourcing (mise en valeur spéciale) */}
+          <div className="bg-[#F4B223] text-[#1B3A5F] rounded-3xl p-8 md:p-12 mb-16 shadow-2xl">
+            <div className="flex items-start gap-4 mb-6">
+              <div className="flex-shrink-0 w-12 h-12 bg-[#1B3A5F] text-[#F4B223] rounded-full flex items-center justify-center">
+                <Globe className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                  Option Sourcing Cotonou ↔ Lomé
+                </h3>
+                <p className="text-base md:text-lg leading-relaxed mb-6">
+                  Nous pouvons également <strong>acheter, récupérer ou sourcer des produits</strong> pour vous auprès de fournisseurs, 
+                  marchés, grossistes ou boutiques à Cotonou ou à Lomé.
+                </p>
+                <div className="bg-[#1B3A5F]/10 rounded-xl p-6">
+                  <h4 className="font-bold text-lg mb-3">Cette option vous permet de :</h4>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-3">
+                      <Check className="w-5 h-5 flex-shrink-0" />
+                      <span>Gagner du temps et éviter les déplacements inutiles</span>
+                    </li>
+                    <li className="flex items-center gap-3">
+                      <Check className="w-5 h-5 flex-shrink-0" />
+                      <span>Vous protéger contre les arnaques</span>
+                    </li>
+                    <li className="flex items-center gap-3">
+                      <Check className="w-5 h-5 flex-shrink-0" />
+                      <span>Bénéficier de nos vérifications sur place et contrôle d'authenticité</span>
+                    </li>
+                    <li className="flex items-center gap-3">
+                      <Check className="w-5 h-5 flex-shrink-0" />
+                      <span>Gestion directe de la transaction sécurisée</span>
+                    </li>
+                  </ul>
+                  <p className="mt-4 text-sm font-medium">
+                    Vous recevez ensuite vos articles en toute sécurité, livrés chez vous via notre service d'expédition.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Tarifs - Renvoi vers page tarifs */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 md:p-12 mb-16 border border-white/20 text-center">
+            <h3 className="text-3xl font-bold mb-4">Tarification</h3>
+            <p className="text-lg mb-6 text-white/90">
+              Des prix <strong className="text-[#F4B223]">simples, transparents et accessibles</strong> (sans frais cachés)
+            </p>
+            <div className="inline-block bg-white text-[#1B3A5F] rounded-2xl p-8 shadow-2xl">
+              <p className="text-sm uppercase font-bold text-gray-500 mb-2">À partir de</p>
+              <p className="text-4xl md:text-5xl font-bold text-[#F4B223] mb-4">5 000 FCFA</p>
+              <p className="text-sm text-gray-600 mb-6">Selon le poids (0,1 à 50 kg)</p>
+              <Link
+                href="/tarifs#expedition-lome"
+                className="inline-flex items-center justify-center bg-[#1B3A5F] text-white px-6 py-3 rounded-lg font-bold hover:bg-[#2C5282] transition-all"
+              >
+                Voir la grille tarifaire complète
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Comment ça marche ? */}
+          <div className="mb-16">
+            <h3 className="text-3xl font-bold text-center mb-12">Comment ça marche ?</h3>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                { step: '1', title: 'Contact', description: 'Via WhatsApp, site web, appel ou Messenger' },
+                { step: '2', title: 'Collecte', description: 'Du colis Mardi ou Jeudi' },
+                { step: '3', title: 'Enregistrement', description: '& sécurisation du colis' },
+                { step: '4', title: 'Transit', description: 'Cotonou ↔ Lomé' },
+                { step: '5', title: 'Notification', description: 'D\'arrivée à destination' },
+                { step: '6', title: 'Livraison', description: 'À domicile ou point relais' }
+              ].map((item, idx) => (
+                <div key={idx} className="relative">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 text-center hover:bg-white/20 transition-all duration-300">
+                    <div className="inline-flex items-center justify-center w-12 h-12 bg-[#F4B223] text-[#1B3A5F] rounded-full font-bold text-xl mb-4">
+                      {item.step}
+                    </div>
+                    <h4 className="font-bold text-lg mb-2">{item.title}</h4>
+                    <p className="text-white/80 text-sm">{item.description}</p>
+                  </div>
+                  {idx < 5 && (
+                    <div className="hidden lg:block absolute top-1/2 -right-3 transform -translate-y-1/2 text-[#F4B223]">
+                      <ArrowRight className="w-6 h-6" />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* CTA spécifique pour ce service */}
+          <div className="text-center">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 md:p-12 border border-white/20 inline-block">
+              <h3 className="text-2xl md:text-3xl font-bold mb-6">
+                Prêt à expédier entre Cotonou et Lomé ?
+              </h3>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a
+                  href={`https://wa.me/${whatsappNumber}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center bg-[#F4B223] text-[#1B3A5F] px-8 py-4 rounded-lg font-bold text-lg hover:bg-[#D4920F] transition-all transform hover:scale-105 shadow-xl"
+                >
+                  <MessageCircle className="mr-2" />
+                  Commander sur WhatsApp
+                </a>
+                <a
+                  href={`tel:${phoneNumber.replace(/ /g, '')}`}
+                  className="inline-flex items-center justify-center bg-white text-[#1B3A5F] px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl"
+                >
+                  <Phone className="mr-2" />
+                  Appeler maintenant
+                </a>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -373,6 +571,8 @@ export default function ServicesPage() {
           </div>
         </div>
       </section>
+      <DevisForm open={isDevisModalOpen} onOpenChange={setIsDevisModalOpen} />
+      <ContactForm open={isContactModalOpen} onOpenChange={setIsContactModalOpen} />
     </div>
   );
 }

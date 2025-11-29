@@ -54,7 +54,7 @@ export default function TarifsAdmin() {
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto sm:py-20 md:pb-8">
+    <div className="px-4 py-30 md:py-20 max-w-7xl mx-auto sm:py-20 md:pb-8">
       <h1 className="text-3xl font-bold text-[#1B3A5F] mb-8">Gestion de la Grille Tarifaire</h1>
 
       {/* Formulaire d'ajout */}

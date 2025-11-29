@@ -1,8 +1,13 @@
 // Fichier: app/a-propos/page.jsx - VERSION AMÉLIORÉE
+'use client';
 import React from 'react';
+import { useState } from 'react';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import OrganigrammeEquipe from '@/components/sections/OrganigrammeEquipe';
+import DevisForm from '@/components/forms/DevisForm';
+import ContactForm from '@/components/forms/ContactForm';
 import { 
   Target, Eye, ShieldCheck, Award, Rocket, CheckCircle, 
   Truck, Zap, Leaf, Users, Heart, TrendingUp, MapPin,
@@ -10,16 +15,6 @@ import {
 } from 'lucide-react';
 import Cta from '@/components/sections/home/Cta';
 
-export const metadata = {
-  title: 'À Propos - Notre Histoire & Valeurs | LE LIVREUR 2.0',
-  description: '1 an d\'engagement, 200 000 km parcourus, 8 000 missions réussies. Découvrez l\'équipe qui révolutionne la livraison à Cotonou avec passion et professionnalisme.',
-  keywords: 'à propos LE LIVREUR 2.0, histoire livraison Cotonou, valeurs entreprise, équipe livraison Bénin',
-  openGraph: {
-    title: 'À Propos de LE LIVREUR 2.0 - Révolution de la Livraison au Bénin',
-    description: '1 an de folie, 8000+ missions réussies, une équipe passionnée',
-    type: 'website',
-  }
-};
 
 // ✅ Stats enrichies avec animations
 const stats = [
@@ -58,31 +53,39 @@ const valeurs = [
   {
     icon: <ShieldCheck className="w-8 h-8" />,
     titre: 'Fiabilité',
-    desc: 'Nous tenons nos promesses. Chaque colis est traité avec le plus grand soin, comme si c\'était le nôtre.',
+    desc: 'Respect des délais et traçabilité des courses.',
     color: 'blue',
     stat: '98% de satisfaction'
   },
   {
-    icon: <Zap className="w-8 h-8" />,
-    titre: 'Rapidité',
-    desc: 'L\'optimisation de nos trajets nous permet de livrer en moins de 45 minutes dans Cotonou.',
-    color: 'yellow',
-    stat: '<45min en moyenne'
-  },
-  {
-    icon: <Heart className="w-8 h-8" />,
-    titre: 'Passion',
-    desc: 'Au-delà du métier, c\'est une vocation. Nous aimons ce que nous faisons et ça se voit.',
-    color: 'red',
-    stat: '5 As de la route'
-  },
-  {
     icon: <Leaf className="w-8 h-8" />,
     titre: 'Écoresponsabilité',
-    desc: 'Une flotte 100% électrique pour un air plus pur et un Bénin plus vert.',
+    desc: 'réduction concrète des émissions et promotion de la mobilité propre.',
     color: 'green',
     stat: '100% électrique'
   },
+  {
+    icon: <Zap className="w-8 h-8" />,
+    titre: 'Proximité',
+    desc: 'Relation client humaine et réactive.',
+    color: 'yellow',
+    stat: ''
+  },
+  {
+    icon: <Heart className="w-8 h-8" />,
+    titre: 'Intégrité',
+    desc: 'Transparence tarifaire et éthique opérationnelle',
+    color: 'red',
+    stat: ''
+  },
+  {
+    icon: <Heart className="w-8 h-8" />,
+    titre: 'Innovation',
+    desc: 'Amélioration continue via la technologie.',
+    color: 'red',
+    stat: ''
+  },
+  
 ];
 
 // ✅ Timeline de l'entreprise
@@ -118,19 +121,43 @@ const equipe = [
   {
     nom: 'Fondateur & CEO',
     role: 'Vision & Stratégie',
-    desc: 'Entrepreneur passionné par la logistique urbaine',
+    desc: 'Entrepreneur engagé pour une logistique urbaine durable et une expérience client exemplaire.',
     icon: <Lightbulb className="w-6 h-6" />
   },
   {
-    nom: 'Les As de la Route',
-    role: '5 Livreurs Professionnels',
-    desc: 'Formés, équipés et motivés à 100%',
-    icon: <Users className="w-6 h-6" />
+    nom: 'Service Commercial',
+    role: 'Relation Client & Développement B2B/B2C',
+    desc: 'Gestion des relations clients, prospection et accompagnement commercial pour répondre aux besoins des particuliers et des entreprises.',
+    icon: <Heart className="w-6 h-6" />
   },
   {
-    nom: 'Support Client',
-    role: 'Service 7j/7',
-    desc: 'Une équipe à votre écoute du lundi au dimanche',
+    nom: 'Service Opérationnel',
+    role: 'Coordination & Supervision Terrain',
+    desc: 'Organisation des tournées, contrôle qualité et optimisation des opérations pour garantir des livraisons rapides et fiables.',
+    icon: <Heart className="w-6 h-6" />
+  },
+  {
+    nom: 'Service Maintenance',
+    role: 'Maintenance & Optimisation de la Flotte Électrique',
+    desc: 'Entretien, contrôle régulier et amélioration continue pour assurer la disponibilité maximale de nos motos électriques.',
+    icon: <Heart className="w-6 h-6" />
+  },
+  {
+    nom: 'Service Livraison',
+    role: 'Les As de la Route',
+    desc: 'Livreurs professionnels, formés et équipés pour assurer un service impeccable, sécurisé et ponctuel.',
+    icon: <Heart className="w-6 h-6" />
+  },
+  {
+    nom: 'Support Client 7j/7',
+    role: 'Assistance & Suivi Continu',
+    desc: 'Une équipe à votre écoute du lundi au dimanche pour répondre à toutes vos demandes.',
+    icon: <Heart className="w-6 h-6" />
+  },
+  {
+    nom: 'Service Technologies & Solutions Digitales',
+    role: 'Développement & Support Technique',
+    desc: 'Une équipe dédiée à la conception, l’amélioration et la maintenance de nos outils numériques, garantissant performance, sécurité et innovation au cœur de nos opérations.',
     icon: <Heart className="w-6 h-6" />
   },
 ];
@@ -142,7 +169,11 @@ const colorClasses = {
   green: 'from-green-500 to-green-600',
 };
 
+
+
 export default function AProposPage() {
+  const [isDevisModalOpen, setIsDevisModalOpen] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   return (
     <>
       {/* ========== HERO SECTION ========== */}
@@ -157,7 +188,7 @@ export default function AProposPage() {
         <div className="absolute bottom-20 right-20 w-32 h-32 bg-blue-400 rounded-full blur-3xl opacity-20 animate-pulse delay-1000"></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-12">
             {/* Contenu gauche */}
             <div>
               <div className="inline-flex items-center gap-2 bg-[#F4B223]/20 backdrop-blur-sm px-4 py-2 rounded-full border border-[#F4B223]/30 mb-6">
@@ -177,63 +208,68 @@ export default function AProposPage() {
               
               <p className="text-xl md:text-2xl text-blue-100 mb-8 leading-relaxed">
                 De <strong className="text-white">1 à 5 "As de la route"</strong>, nous avons bâti une dream team à votre service. 
-                Plus qu'une agence de livraison, nous sommes une <strong className="text-[#F4B223]">révolution logistique</strong> à Cotonou.
+                Plus qu'une agence de livraison, nous sommes une <strong className="text-[#F4B223]">révolution logistique</strong> au Bénin.
               </p>
               
               {/* CTA rapides */}
               <div className="flex flex-wrap gap-4 mb-12">
-                <Link 
-                  href="/devis"
+                <button 
+                  onClick={() => setIsDevisModalOpen(true)}
                   className="inline-flex items-center gap-2 px-6 py-3 bg-[#F4B223] hover:bg-[#D4920F] text-[#1B3A5F] font-bold rounded-lg transition-all shadow-lg hover:shadow-xl"
                 >
                   Demander un devis
                   <ArrowRight className="w-5 h-5" />
-                </Link>
-                <Link 
-                  href="/contact"
+                </button>
+                <button 
+                  onClick={() => setIsContactModalOpen(true)}
                   className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg transition-all"
                 >
                   Nous contacter
-                </Link>
-              </div>
-              
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 gap-4">
-                {stats.map((stat, idx) => (
-                  <div 
-                    key={idx} 
-                    className="bg-white/10 backdrop-blur-sm p-5 rounded-xl border border-white/20 hover:bg-white/15 transition-all group"
-                  >
-                    <div className={`bg-gradient-to-r ${stat.color} w-12 h-12 rounded-lg flex items-center justify-center mb-3 text-white group-hover:scale-110 transition-transform`}>
-                      {stat.icon}
-                    </div>
-                    <div className="text-3xl font-bold mb-1">{stat.value}</div>
-                    <div className="text-sm text-blue-200 font-semibold">{stat.label}</div>
-                    <div className="text-xs text-blue-300 mt-1">{stat.description}</div>
-                  </div>
-                ))}
+                </button>
               </div>
             </div>
 
             {/* Image droite */}
             <div className="relative h-[500px] lg:h-[600px] w-full rounded-2xl overflow-hidden shadow-2xl border-4 border-[#F4B223] group">
-               <div className="absolute inset-0 bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 flex items-center justify-center text-center p-8">
-                  <div className="space-y-4">
-                    <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto backdrop-blur-sm">
-                      <Truck className="w-12 h-12 text-white" />
+    
+                {/* Placeholder (Caché par l'image) */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 flex items-center justify-center text-center p-8">
+                    <div className="space-y-4">
+                        <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto backdrop-blur-sm">
+                            <Truck className="w-12 h-12 text-white" />
+                        </div>
+                        <p className="text-white font-bold text-2xl">Image "1 an à vos côtés"</p>
                     </div>
-                    <p className="text-white font-bold text-2xl">Image "1 an à vos côtés"</p>
-                    <p className="text-white/90 text-sm max-w-xs mx-auto">
-                      Remplacez par : Photo du livreur souriant sur sa moto électrique, avec le logo LE LIVREUR 2.0
-                    </p>
-                    <p className="text-xs text-white/70 mt-4">
-                      Chemin: /public/images/about-hero.jpg
-                    </p>
-                  </div>
-               </div>
-               <Image src="/about-hero.jpg" alt="Équipe LE LIVREUR 2.0" fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                </div>
+
+                {/* L'IMAGE FINALE */}
+                <Image 
+                    src="/about-hero.jpg" 
+                    alt="Équipe LE LIVREUR 2.0" 
+                    fill 
+                    // 1. On garde object-cover pour le remplissage
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    // 2. ON FORCE L'ALIGNEMENT EN HAUT ICI :
+                    style={{ objectPosition: 'top' }} 
+                />
             </div>
           </div>
+          {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 my-12">
+              {stats.map((stat, idx) => (
+                <div 
+                  key={idx} 
+                  className="bg-white/10 backdrop-blur-sm p-5 rounded-xl border border-white/20 hover:bg-white/15 transition-all group"
+                >
+                  <div className={`bg-gradient-to-r ${stat.color} w-12 h-12 rounded-lg flex items-center justify-center mb-3 text-white group-hover:scale-110 transition-transform`}>
+                    {stat.icon}
+                  </div>
+                  <div className="text-3xl font-bold mb-1">{stat.value}</div>
+                  <div className="text-sm text-blue-200 font-semibold">{stat.label}</div>
+                  <div className="text-xs text-blue-300 mt-1">{stat.description}</div>
+                </div>
+              ))}
+            </div>
         </div>
       </section>
 
@@ -266,8 +302,8 @@ export default function AProposPage() {
                 </div>
                 <h3 className="text-2xl font-bold text-[#1B3A5F] mb-4">Notre Mission</h3>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Offrir un service de livraison hautement performant, alliant <strong>rapidité</strong>, <strong>sécurité</strong> et <strong>transparence</strong>, 
-                  afin d'améliorer la mobilité des marchandises en zone urbaine.
+                  Offrir un service de livraison <strong>rapide</strong>, <strong>fiable</strong> et <strong>durable</strong>, 
+                  en combinant digitalisation et mobilité électrique pour faciliter le commerce local et améliorer la qualité de vie urbaine.
                 </p>
                 <div className="flex items-center gap-2 text-sm text-blue-700 font-semibold">
                   <CheckCircle className="w-4 h-4" />
@@ -285,8 +321,7 @@ export default function AProposPage() {
                 </div>
                 <h3 className="text-2xl font-bold text-[#1B3A5F] mb-4">Notre Vision</h3>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Devenir le <strong>réseau de livreurs professionnels le plus fiable</strong> du Bénin et de la sous-région CEDEAO, 
-                  en intégrant la logistique moderne et la digitalisation.
+                  Devenir le <strong>référence de la livraison verte </strong> au Bénin puis régionale, en alliant <strong>innovation, inclusion sociale et performance environnementale.</strong> 
                 </p>
                 <div className="flex items-center gap-2 text-sm text-orange-700 font-semibold">
                   <TrendingUp className="w-4 h-4" />
@@ -396,55 +431,7 @@ export default function AProposPage() {
       </section>
 
       {/* ========== ÉQUIPE ========== */}
-      <section className="py-20 bg-gradient-to-br from-[#1B3A5F] to-[#2C5282] text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="inline-block mb-4 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 font-bold text-sm uppercase tracking-wider rounded-full">
-              Notre Force
-            </div>
-            <h2 className="text-4xl font-bold mb-4">
-              Une Équipe Passionnée
-            </h2>
-            <p className="text-blue-100 max-w-2xl mx-auto">
-              Des professionnels dévoués qui font la différence chaque jour
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {equipe.map((membre, idx) => (
-              <div 
-                key={idx}
-                className="bg-white/10 backdrop-blur-sm p-8 rounded-2xl border border-white/20 hover:bg-white/15 transition-all text-center"
-              >
-                <div className="bg-gradient-to-r from-[#F4B223] to-yellow-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 text-white shadow-lg">
-                  {membre.icon}
-                </div>
-                <h3 className="text-xl font-bold mb-2">{membre.nom}</h3>
-                <p className="text-[#F4B223] font-semibold text-sm mb-3">{membre.role}</p>
-                <p className="text-blue-100 text-sm">{membre.desc}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* CTA Rejoindre */}
-          <div className="mt-16 text-center">
-            <div className="inline-block bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-              <Users className="w-12 h-12 text-[#F4B223] mx-auto mb-4" />
-              <h3 className="text-2xl font-bold mb-3">Vous voulez rejoindre l'aventure ?</h3>
-              <p className="text-blue-100 mb-6 max-w-md mx-auto">
-                Nous recherchons constamment des livreurs motivés et professionnels
-              </p>
-              <Link 
-                href="/contact"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[#F4B223] hover:bg-[#D4920F] text-[#1B3A5F] font-bold rounded-lg transition-colors shadow-lg"
-              >
-                Postuler maintenant
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <OrganigrammeEquipe />
 
       {/* ========== IMPACT ========== */}
       <section className="py-20 bg-green-50">
@@ -510,7 +497,7 @@ export default function AProposPage() {
                   </p>
                 </div>
               </div>
-              {/* <Image src="/images/impact-eco.jpg" alt="Impact écologique" fill className="object-cover" /> */}
+              <Image src="/moto-electrique.png" alt="Impact écologique" fill className="object-cover" />
             </div>
           </div>
         </div>
@@ -631,17 +618,6 @@ export default function AProposPage() {
               </div>
             </div>
           </div>
-
-          {/* CTA Avis */}
-          <div className="mt-12 text-center">
-            <Link 
-              href="/contact"
-              className="inline-flex items-center gap-2 text-[#1B3A5F] hover:text-[#F4B223] font-semibold transition-colors"
-            >
-              Voir tous les avis
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -731,6 +707,9 @@ export default function AProposPage() {
             </div>
           </div>
         </div>
+        {/* Formulaires */}
+        <DevisForm open={isDevisModalOpen} onOpenChange={setIsDevisModalOpen} />
+        <ContactForm open={isContactModalOpen} onOpenChange={setIsContactModalOpen} />
       </section>
 
       {/* ========== CTA FINAL ========== */}

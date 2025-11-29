@@ -5,10 +5,12 @@ import { useState, useEffect } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 import { Check, X, Zap, Clock, Package, Building2, Crown, Star, TrendingUp, Phone, ArrowRight, MapPin } from 'lucide-react';
 import DevisForm from '@/components/forms/DevisForm';
+import Link from 'next/link';
 
 export default function TarifsPage() {
   const [tarifs, setTarifs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const phoneNumber = "01 47 04 28 15";
   const cleanPhone = "2290147042815";
@@ -155,6 +157,91 @@ export default function TarifsPage() {
             </div>
           </div>
 
+          {/* TARIFS EXPÉDITION COTONOU ↔ LOMÉ */}
+          <section id="expedition-lome" className="mb-12 scroll-mt-20">
+            <div className="bg-gradient-to-br from-[#1B3A5F] via-[#2C5282] to-[#1B3A5F] text-white rounded-3xl shadow-2xl overflow-hidden">
+              
+              {/* Header */}
+              <div className="bg-white/10 backdrop-blur-sm p-8 border-b border-white/20">
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <div>
+                    <div className="inline-flex items-center gap-2 bg-[#F4B223]/20 text-[#F4B223] px-4 py-1 rounded-full text-sm font-bold mb-3 border border-[#F4B223]/30">
+                      🌍 Service International
+                    </div>
+                    <h2 className="text-3xl md:text-4xl font-bold mb-2">
+                      Expédition Cotonou ↔ Lomé
+                    </h2>
+                    <p className="text-lg text-white/90">
+                      Service transfrontalier sécurisé • Départs réguliers Mardi & Jeudi
+                    </p>
+                  </div>
+                  <Link
+                    href="/services#expedition-lome"
+                    className="inline-flex items-center bg-white/20 backdrop-blur-sm text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-white/30 transition-all border border-white/30"
+                  >
+                    Voir les détails du service
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+
+              {/* Grille Tarifaire */}
+              <div className="p-8 md:p-12">
+                <div className="grid md:grid-cols-3 gap-6 mb-8">
+                  {[
+                    { weight: '0,1 – 17 kg', price: '5 000', description: 'Petits colis et documents' },
+                    { weight: '17,1 – 34 kg', price: '7 500', description: 'Colis moyens' },
+                    { weight: '34,1 – 50 kg', price: '10 000', description: 'Gros colis' }
+                  ].map((tarif, idx) => (
+                    <div 
+                      key={idx} 
+                      className="bg-white text-[#1B3A5F] rounded-2xl p-6 text-center shadow-lg hover:scale-105 transition-transform duration-300 border-2 border-[#F4B223]"
+                    >
+                      <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
+                        Poids
+                      </p>
+                      <p className="text-2xl font-bold mb-3 text-[#1B3A5F]">
+                        {tarif.weight}
+                      </p>
+                      <div className="h-1 w-12 bg-[#F4B223] mx-auto mb-4"></div>
+                      <p className="text-4xl font-bold text-[#F4B223] mb-2">
+                        {tarif.price}
+                        <span className="text-lg ml-1">FCFA</span>
+                      </p>
+                      <p className="text-xs text-gray-500 font-medium mt-2">
+                        {tarif.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* CTA */}
+                <div className="mt-8 text-center">
+                  <p className="text-white/90 mb-4 text-sm">
+                    💡 <strong>Paiement simple :</strong> À la collecte ou au ramassage selon votre convenance
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a
+                      href={`https://wa.me/${cleanPhone}?text=Bonjour, je souhaite des informations sur l'expédition Cotonou ↔ Lomé`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center bg-[#F4B223] text-[#1B3A5F] px-8 py-4 rounded-lg font-bold hover:bg-[#D4920F] transition-all shadow-lg"
+                    >
+                      Commander sur WhatsApp
+                    </a>
+                    <a
+                      href={`tel:+${cleanPhone}`}
+                      className="inline-flex items-center justify-center bg-white/20 backdrop-blur-sm text-white px-8 py-4 rounded-lg font-bold hover:bg-white/30 transition-all border border-white/30"
+                    >
+                      <Phone className="mr-2 w-5 h-5" />
+                      Appeler maintenant
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
           {/* Majoration (Statique) */}
           <div className="bg-[#1B3A5F] text-white rounded-2xl p-8 md:p-10 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
              {/* ... (Le code de la majoration reste identique, copiez-le de la version précédente) ... */}
@@ -165,17 +252,17 @@ export default function TarifsPage() {
               <div>
                 <h3 className="text-2xl font-bold text-[#F4B223] mb-2">Majoration Spéciale</h3>
                 <p className="text-lg text-blue-100 max-w-2xl">
-                  Livraisons Express, de Nuit (après 21h) ou le Week-end :<br/>
+                  Livraisons Express, Nuit, Week-ends & Jours fériés (après 20h) :<br/>
                   <strong className="text-white text-xl">+ 50% sur le tarif standard</strong>
                 </p>
               </div>
             </div>
-            <a 
-              href="#devis" 
+            <button 
+              onClick={() => setIsModalOpen(true)} 
               className="bg-white text-[#1B3A5F] px-8 py-4 rounded-xl font-bold hover:bg-[#F4B223] transition-colors shadow-lg whitespace-nowrap"
             >
               Calculer mon prix
-            </a>
+            </button>
           </div>
 
         </div>
@@ -206,7 +293,7 @@ export default function TarifsPage() {
                             </li>
                         ))}
                     </ul>
-                    <a href="#devis" className="block text-center w-full bg-gray-100 py-3 rounded-lg font-bold hover:bg-gray-200">Choisir</a>
+                    <button onClick={() => setIsModalOpen(true)} className="block text-center w-full bg-gray-100 py-3 rounded-lg font-bold hover:bg-gray-200">Démarrer</button>
                  </div>
               </div>
             ))}
@@ -215,14 +302,7 @@ export default function TarifsPage() {
       </section>
 
       {/* Formulaire Devis */}
-      <section id="devis" className="py-20 bg-gray-50 scroll-mt-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-             <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12">
-                <h2 className="text-3xl font-bold text-center text-[#1B3A5F] mb-8">Demandez votre Devis</h2>
-                <DevisForm />
-             </div>
-        </div>
-      </section>
+      <DevisForm open={isModalOpen} onOpenChange={setIsModalOpen} />
 
     </div>
   );

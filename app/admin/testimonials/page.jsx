@@ -40,7 +40,7 @@ export default function TestimonialsAdmin() {
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto sm:py-20 md:pb-8">
+    <div className="px-4 py-30 md:py-20 max-w-7xl mx-auto sm:py-20 md:pb-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-[#1B3A5F]">Gestion des Avis Clients</h1>
         <button onClick={() => setIsFormOpen(true)} className="bg-[#F4B223] text-[#1B3A5F] px-4 py-2 rounded-lg font-bold flex items-center gap-2">

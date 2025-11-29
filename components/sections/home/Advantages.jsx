@@ -3,6 +3,8 @@
 
 import { useState, useEffect } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
+import TestimonialsSection from '@/components/sections/home/TestimonialsSection';
+import DevisForm from '@/components/forms/DevisForm';
 import { 
   CheckCircle, MapPin, Clock, Shield, 
   Users, Smartphone, Award, Quote 
@@ -11,6 +13,7 @@ import Link from 'next/link';
 
 export default function Advantages() {
   const [testimonials, setTestimonials] = useState([]);
+  const [isDevisModalOpen, setIsDevisModalOpen] = useState(false);
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -23,8 +26,8 @@ export default function Advantages() {
         .from('testimonials')
         .select('*')
         .eq('is_active', true)
-        .order('created_at', { ascending: false })
-        .limit(3); // On en affiche 3 sur l'accueil
+        .order('created_at', { ascending: false });
+        // ⬆️ J'ai retiré le .limit(3)
       setTestimonials(data || []);
     }
     fetchTestimonials();
@@ -95,12 +98,12 @@ export default function Advantages() {
               <p className="text-blue-100 text-lg mb-8 leading-relaxed">
                 Profitez de tarifs préférentiels, d'une facturation mensuelle simplifiée et d'un gestionnaire de compte dédié pour toutes vos courses.
               </p>
-              <Link 
-                href="/tarifs#entreprise"
+              <button 
+                onClick={() => setIsDevisModalOpen(true)}
                 className="inline-flex items-center bg-[#F4B223] text-[#1B3A5F] px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#D4920F] transition-colors shadow-lg"
               >
                 Obtenir un devis pro
-              </Link>
+              </button>
             </div>
             {/* Liste des avantages Pro */}
             <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
@@ -128,32 +131,9 @@ export default function Advantages() {
 
         {/* --- PARTIE 3 : TÉMOIGNAGES DYNAMIQUES --- */}
         {testimonials.length > 0 && (
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-[#1B3A5F] mb-12">
-              Ce que disent nos clients
-            </h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {testimonials.map((t) => (
-                <div key={t.id} className="bg-white p-8 rounded-2xl shadow-lg border border-gray-50 text-left relative">
-                  <Quote className="w-10 h-10 text-gray-100 absolute top-6 right-6" />
-                  <div className="flex text-[#F4B223] mb-4">
-                    {[...Array(t.rating)].map((_, i) => (
-                      <span key={i}>★</span>
-                    ))}
-                  </div>
-                  <p className="text-gray-600 mb-6 italic leading-relaxed">
-                    "{t.content}"
-                  </p>
-                  <div>
-                    <p className="font-bold text-[#1B3A5F]">{t.name}</p>
-                    <p className="text-sm text-gray-400 uppercase tracking-wide">{t.role}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <TestimonialsSection testimonials={testimonials} />
         )}
-
+        <DevisForm open={isDevisModalOpen} onOpenChange={setIsDevisModalOpen} />
       </div>
     </section>
   );

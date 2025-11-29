@@ -84,8 +84,7 @@ export default function HeroSlidesAdmin() {
   }
 
   return (
-    // Padding réduit sur mobile (p-4) et agrandi sur desktop (md:p-8)
-    <div className="p-4 md:p-8 max-w-7xl mx-auto sm:py-20 md:pb-8">
+    <div className="px-4 py-30 md:py-20 max-w-7xl mx-auto sm:py-20 md:pb-8">
       {notification && (
         <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl animate-in slide-in-from-top-5 fade-in duration-300 ${
           notification.type === 'success' ? 'bg-[#1B3A5F] text-white' : 'bg-red-500 text-white'

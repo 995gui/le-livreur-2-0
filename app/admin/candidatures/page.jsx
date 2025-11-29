@@ -70,24 +70,34 @@ export default function CandidaturesPage() {
     }
   }
 
-  // ✅ Mise à jour du statut
-  const updateStatus = useCallback(async (id, newStatus) => {
+  // ✅ Mise à jour du statut (Version Corrigée "notes")
+  const updateStatus = useCallback(async (id, newStatus, noteContent = null) => {
     setActionLoading(true);
     try {
+      // On prépare les données à mettre à jour
+      const updates = { 
+        status: newStatus, 
+        updated_at: new Date().toISOString() 
+      };
+      
+      // ✅ ICI : On utilise ton champ 'notes' existant
+      if (noteContent !== null) updates.notes = noteContent;
+
       const { error } = await supabase
         .from('candidatures')
-        .update({ status: newStatus, updated_at: new Date().toISOString() })
+        .update(updates)
         .eq('id', id);
 
       if (error) throw error;
 
+      // Mise à jour locale
       setCandidatures(prev => 
-        prev.map(c => c.id === id ? { ...c, status: newStatus } : c)
+        prev.map(c => c.id === id ? { ...c, ...updates } : c)
       );
 
       toast({
         title: "✅ Statut mis à jour",
-        description: `La candidature est maintenant "${getStatusLabel(newStatus)}"`,
+        description: `Candidature passée en "${getStatusLabel(newStatus)}"`,
       });
     } catch (error) {
       console.error('Erreur update:', error);
@@ -207,7 +217,7 @@ export default function CandidaturesPage() {
   };
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto sm:py-20 md:pb-8">
+    <div className="px-4 py-30 md:py-20 max-w-7xl mx-auto sm:py-20 md:pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* ========== HEADER ========== */}
@@ -554,19 +564,117 @@ function BadgeStatus({ status }) {
 }
 
 // ========== COMPOSANT MODAL ========== //
+// ========== COMPOSANT MODAL (VERSION RENDEZ-VOUS FIXE) ========== //
 function CandidatureModal({ candidature, onClose, onUpdateStatus, onDelete }) {
-  const [note, setNote] = useState('');
+  const [note, setNote] = useState(candidature.notes || '');
+  const [isSending, setIsSending] = useState(false);
+  
+  // Nouveaux états pour la planification
+  const [interviewDate, setInterviewDate] = useState('');
+  const [interviewTime, setInterviewTime] = useState('');
+
+  const handleResponse = async (action) => {
+    let subject = "";
+    let htmlBody = "";
+    let newStatus = "";
+
+    // 1. Scénario : CONVOCATION (Avec Date Fixe)
+    if (action === 'interview') {
+      // Validation : On oblige l'admin à choisir une date
+      if (!interviewDate || !interviewTime) {
+        alert("⚠️ Veuillez choisir une DATE et une HEURE pour l'entretien avant d'envoyer.");
+        return;
+      }
+
+      // Formatage de la date en français (ex: Lundi 14 Novembre)
+      const dateObj = new Date(interviewDate);
+      const dateStr = dateObj.toLocaleDateString('fr-FR', { 
+        weekday: 'long', 
+        day: 'numeric', 
+        month: 'long', 
+        year: 'numeric' 
+      });
+
+      newStatus = 'accepted';
+      subject = "Convocation à un entretien - LE LIVREUR 2.0";
+      htmlBody = `
+        <p>Bonjour <strong>${candidature.name}</strong>,</p>
+        <p>Suite à l'étude de votre candidature, nous avons le plaisir de vous inviter à un entretien.</p>
+        <div style="background-color: #f3f4f6; padding: 15px; border-left: 4px solid #1B3A5F; margin: 20px 0;">
+          <p style="margin:0; font-weight:bold;">📅 Date : ${dateStr}</p>
+          <p style="margin:0; font-weight:bold;">⏰ Heure : ${interviewTime}</p>
+          <p style="margin:0;">📍 Lieu : Siège LE LIVREUR 2.0 (Cotonou)</p>
+        </div>
+        <p>Merci de nous confirmer votre présence par retour de mail.</p>
+        <br/>
+        <p>Cordialement,<br/>L'équipe Recrutement LE LIVREUR 2.0</p>
+      `;
+    } 
+    // 2. Scénario : REFUS
+    else if (action === 'reject') {
+      newStatus = 'rejected';
+      subject = "Mise à jour concernant votre candidature - LE LIVREUR 2.0";
+      htmlBody = `
+        <p>Bonjour <strong>${candidature.name}</strong>,</p>
+        <p>Nous vous remercions de l'intérêt que vous portez à notre entreprise.</p>
+        <p>Malgré la qualité de votre parcours, nous avons le regret de vous informer que nous ne donnerons pas suite à votre candidature pour le moment.</p>
+        <p>Nous conservons toutefois votre CV pour de futures opportunités.</p>
+        <br/>
+        <p>Bonne continuation,<br/>L'équipe Recrutement LE LIVREUR 2.0</p>
+      `;
+    }
+    // 3. Scénario : WHATSAPP
+    else if (action === 'whatsapp') {
+      const message = `Bonjour ${candidature.name}, c'est LE LIVREUR 2.0. Nous avons bien reçu votre candidature. Avez-vous quelques minutes pour échanger ?`;
+      const url = `https://wa.me/${candidature.phone.replace(/\D/g,'')}?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank');
+      return; 
+    }
+
+    // --- ENVOI AUTOMATIQUE ---
+    if (newStatus) {
+      setIsSending(true);
+      try {
+        const res = await fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: candidature.email,
+            subject: subject,
+            html: htmlBody
+          })
+        });
+
+        if (!res.ok) throw new Error("Erreur lors de l'envoi du mail");
+
+        // Sauvegarde de la note (avec la date d'entretien si définie)
+        let finalNote = note;
+        if (action === 'interview') {
+          finalNote = `Entretien fixé le ${interviewDate} à ${interviewTime}. ` + (note || "");
+        }
+
+        onUpdateStatus(candidature.id, newStatus, finalNote || "Réponse automatique envoyée.");
+        onClose();
+
+      } catch (error) {
+        alert("Erreur: Le mail n'a pas pu partir. Vérifiez l'adresse email du candidat.");
+        console.error(error);
+      } finally {
+        setIsSending(false);
+      }
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col">
         {/* Header */}
         <div className="bg-gradient-to-r from-[#1B3A5F] to-[#2C5282] p-6 text-white sticky top-0 z-10">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold flex items-center gap-3">
                 <FileText className="w-7 h-7" />
-                Détails de la Candidature
+                Candidature de {candidature.name.split(' ')[0]}
               </h2>
               <p className="text-blue-200 text-sm mt-1">
                 Reçue le {new Date(candidature.created_at).toLocaleDateString('fr-FR')}
@@ -576,114 +684,140 @@ function CandidatureModal({ candidature, onClose, onUpdateStatus, onDelete }) {
           </div>
         </div>
 
-        {/* Contenu */}
-        <div className="p-8 space-y-6">
-          {/* Informations personnelles */}
-          <div>
-            <h3 className="text-lg font-bold text-[#1B3A5F] mb-4 flex items-center gap-2">
-              <Users className="w-5 h-5" />
-              Informations du Candidat
-            </h3>
-            <div className="grid md:grid-cols-2 gap-4">
-              <InfoCard icon={<Users />} label="Nom complet" value={candidature.name} />
-              <InfoCard icon={<Phone />} label="Téléphone" value={candidature.phone} />
-              <InfoCard icon={<Mail />} label="Email" value={candidature.email || 'Non renseigné'} />
-              <InfoCard icon={<Calendar />} label="Expérience" value={candidature.experience || 'Non renseignée'} />
-            </div>
+        {/* Contenu Scrollable */}
+        <div className="p-8 space-y-6 flex-1 overflow-y-auto">
+          {/* Informations */}
+          <div className="grid md:grid-cols-2 gap-4">
+            <InfoCard icon={<Phone />} label="Téléphone" value={candidature.phone} />
+            <InfoCard icon={<Mail />} label="Email" value={candidature.email || 'Non renseigné'} />
+            <InfoCard icon={<Calendar />} label="Expérience" value={candidature.experience || '-'} />
+            <InfoCard icon={<FileText />} label="CV" value={candidature.cv_url ? "Disponible" : "Non"} />
           </div>
 
-          {/* Motivation */}
-          {candidature.motivation && (
-            <div>
-              <h3 className="text-lg font-bold text-[#1B3A5F] mb-3 flex items-center gap-2">
-                <MessageSquare className="w-5 h-5" />
-                Lettre de Motivation
-              </h3>
+          <div className="grid md:grid-cols-2 gap-6">
+            {candidature.motivation && (
               <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
-                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                <h3 className="font-bold text-[#1B3A5F] mb-2 text-sm uppercase">Motivation</h3>
+                <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
                   {candidature.motivation}
                 </p>
               </div>
-            </div>
-          )}
+            )}
+            
+            <div className="flex flex-col gap-4">
+               {candidature.cv_url && (
+                <a
+                  href={candidature.cv_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center justify-center gap-2 px-4 py-8 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold rounded-xl border-2 border-dashed border-blue-200 transition-all"
+                >
+                  <Download className="w-6 h-6" />
+                  Voir le CV Complet
+                </a>
+              )}
+              
+              {/* Zone Note Interne */}
+              <div>
+                <Label className="text-sm font-bold text-gray-500 uppercase mb-2 block">
+                  Note Interne / Mémo
+                </Label>
+                <Textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="Ex: Candidat intéressant..."
+                  className="bg-yellow-50/50 border-yellow-100 min-h-[80px]"
+                />
+              </div>
 
-          {/* CV */}
-          {candidature.cv_url && (
-            <div>
-              <h3 className="text-lg font-bold text-[#1B3A5F] mb-3 flex items-center gap-2">
-                <FileText className="w-5 h-5" />
-                Curriculum Vitae
-              </h3>
-              <a
-                href={candidature.cv_url}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold rounded-lg transition-colors border border-blue-200"
-              >
-                <Download className="w-5 h-5" />
-                Télécharger le CV
-              </a>
-            </div>
-          )}
+              {/* --- NOUVEAU : Zone Planification Entretien --- */}
+              <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                <h4 className="text-sm font-bold text-[#1B3A5F] mb-3 flex items-center">
+                  <Calendar className="w-4 h-4 mr-2"/> 
+                  Planifier l'entretien
+                </h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs text-blue-800 mb-1 block">Date</Label>
+                    <Input 
+                      type="date" 
+                      value={interviewDate}
+                      onChange={(e) => setInterviewDate(e.target.value)}
+                      className="bg-white border-blue-200 h-9"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-blue-800 mb-1 block">Heure</Label>
+                    <Input 
+                      type="time" 
+                      value={interviewTime}
+                      onChange={(e) => setInterviewTime(e.target.value)}
+                      className="bg-white border-blue-200 h-9"
+                    />
+                  </div>
+                </div>
+                <p className="text-xs text-blue-600 mt-2 italic">
+                  * Nécessaire uniquement si vous cliquez sur "Convoquer".
+                </p>
+              </div>
+              {/* ------------------------------------------- */}
 
-          {/* Note interne (placeholder) */}
-          <div>
-            <Label htmlFor="note" className="text-lg font-bold text-[#1B3A5F] mb-3 flex items-center gap-2">
-              <FileText className="w-5 h-5" />
-              Note Interne (optionnelle)
-            </Label>
-            <Textarea
-              id="note"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="Ajoutez des notes sur ce candidat..."
-              className="min-h-[100px]"
-            />
+            </div>
           </div>
         </div>
 
         {/* Footer Actions */}
-        <div className="bg-gray-50 p-6 flex flex-wrap gap-3 justify-between border-t sticky bottom-0">
-          <div className="flex gap-3">
+        <div className="bg-gray-50 p-5 border-t sticky bottom-0 z-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {/* 1. WhatsApp */}
             <Button
-              onClick={() => {
-                onUpdateStatus(candidature.id, 'accepted');
-                onClose();
-              }}
-              className="bg-green-600 hover:bg-green-700 text-white"
-            >
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Accepter
-            </Button>
-            <Button
-              onClick={() => {
-                onUpdateStatus(candidature.id, 'rejected');
-                onClose();
-              }}
+              onClick={() => handleResponse('whatsapp')}
               variant="outline"
-              className="border-red-300 text-red-600 hover:bg-red-50"
+              disabled={isSending}
+              className="bg-white text-green-600 border-green-200 hover:bg-green-50 h-12"
             >
-              <XCircle className="w-4 h-4 mr-2" />
+              <MessageSquare className="w-5 h-5 mr-2" />
+              WhatsApp
+            </Button>
+
+            {/* 2. Refuser */}
+            <Button
+              onClick={() => handleResponse('reject')}
+              variant="outline"
+              disabled={isSending || !candidature.email}
+              className="bg-white text-red-600 border-red-200 hover:bg-red-50 h-12"
+            >
+              {isSending ? <RefreshCw className="w-5 h-5 animate-spin mr-2"/> : <XCircle className="w-5 h-5 mr-2" />}
               Refuser
             </Button>
-          </div>
-          <div className="flex gap-3">
+
+            {/* 3. Accepter (Convoquer) */}
             <Button
-              onClick={() => {
-                if (confirm('Supprimer définitivement cette candidature ?')) {
-                  onDelete(candidature.id);
-                  onClose();
-                }
-              }}
-              variant="ghost"
-              className="text-red-600 hover:bg-red-50"
+              onClick={() => handleResponse('interview')}
+              disabled={isSending || !candidature.email}
+              className="bg-[#1B3A5F] hover:bg-[#2C5282] text-white h-12 shadow-md"
             >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Supprimer
+              {isSending ? <RefreshCw className="w-5 h-5 animate-spin mr-2"/> : <CheckCircle className="w-5 h-5 mr-2" />}
+              Convoquer
             </Button>
-            <Button onClick={onClose} variant="outline">
-              Fermer
-            </Button>
+          </div>
+          
+          <div className="text-center mt-4">
+             <button 
+               onClick={() => {
+                  if (confirm('Supprimer définitivement ?')) {
+                    onDelete(candidature.id);
+                    onClose();
+                  }
+               }}
+               disabled={isSending}
+               className="text-xs text-gray-400 hover:text-red-500 underline"
+             >
+               Supprimer cette candidature
+             </button>
+             <button onClick={onClose} disabled={isSending} className="ml-4 text-xs text-gray-400 hover:text-gray-600 underline">
+               Fermer
+             </button>
           </div>
         </div>
       </div>

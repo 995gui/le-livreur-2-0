@@ -15,12 +15,14 @@ import {
 export default function AdminNavbar() {
   const pathname = usePathname();
   const router = useRouter();
+  
+  // États
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Ajouté pour cohérence si utilisé
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [user, setUser] = useState(null); // <--- NOUVEAU : Stocke l'user connecté
   const [counts, setCounts] = useState({ devis: 0, candidatures: 0, contacts: 0 });
-  
+   
   const sidebarRef = useRef(null);
   const userMenuRef = useRef(null);
 
@@ -32,10 +34,15 @@ export default function AdminNavbar() {
     []
   );
 
-  // ✅ Récupération des compteurs de notifications
+  // ✅ Récupération User + Compteurs
   useEffect(() => {
-    const fetchCounts = async () => {
+    const fetchData = async () => {
       try {
+        // 1. Récupérer l'utilisateur connecté
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+
+        // 2. Récupérer les compteurs
         const [devisRes, candidaturesRes, contactsRes] = await Promise.all([
           supabase.from('devis_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
           supabase.from('candidatures').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
@@ -48,16 +55,22 @@ export default function AdminNavbar() {
           contacts: contactsRes.count || 0
         });
       } catch (error) {
-        console.error('Erreur fetch counts:', error);
+        console.error('Erreur fetch data:', error);
       }
     };
 
-    fetchCounts();
-    const interval = setInterval(fetchCounts, 30000); // Refresh toutes les 30s
+    fetchData();
+    const interval = setInterval(fetchData, 30000); // Refresh toutes les 30s
     return () => clearInterval(interval);
   }, [supabase]);
 
   const totalNotifications = counts.devis + counts.candidatures + counts.contacts;
+
+  // Helper pour les initiales (ex: admin@test.com -> AD)
+  const getInitials = () => {
+    if (!user || !user.email) return 'AD';
+    return user.email.substring(0, 2).toUpperCase();
+  };
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -124,7 +137,7 @@ export default function AdminNavbar() {
 
           {/* Right Section */}
           <div className="flex items-center space-x-2">
-            
+             
             {/* --- 1. BOUTON VOIR LE SITE (Desktop) --- */}
             <Link 
               href="/" 
@@ -158,7 +171,7 @@ export default function AdminNavbar() {
                 className="flex items-center space-x-2 p-1.5 pr-3 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <div className="w-8 h-8 bg-gradient-to-br from-[#F4B223] to-[#1B3A5F] rounded-full flex items-center justify-center">
-                  <span className="text-xs font-semibold text-white">AD</span>
+                  <span className="text-xs font-semibold text-white">{getInitials()}</span>
                 </div>
                 <ChevronDown className="w-4 h-4 text-gray-500 hidden sm:block" />
               </button>
@@ -167,10 +180,14 @@ export default function AdminNavbar() {
               {showUserMenu && (
                 <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 animate-in fade-in slide-in-from-top-2 duration-200">
                   <div className="px-4 py-3 border-b border-gray-100">
-                    <p className="text-sm font-semibold text-gray-900">Administrateur</p>
-                    <p className="text-xs text-gray-500">admin@lelivreur2.bj</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                       {user?.user_metadata?.full_name || 'Administrateur'}
+                    </p>
+                    <p className="text-xs text-gray-500 truncate" title={user?.email}>
+                        {user?.email || 'Chargement...'}
+                    </p>
                   </div>
-                  
+                   
                   {/* --- 2. LIEN VOIR LE SITE (Mobile) --- */}
                   <Link 
                     href="/" 
@@ -227,7 +244,7 @@ export default function AdminNavbar() {
             {navigation.map((item) => {
               const isActive = pathname === item.href || (item.href !== '/admin' && pathname?.startsWith(item.href));
               const Icon = item.icon;
-              
+               
               return (
                 <Link
                   key={item.name}
@@ -242,7 +259,7 @@ export default function AdminNavbar() {
                     <Icon className="w-5 h-5 flex-shrink-0" />
                     <span>{item.name}</span>
                   </div>
-                  
+                   
                   {/* Badge Compteur */}
                   {item.count > 0 ? (
                     <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
@@ -272,7 +289,9 @@ export default function AdminNavbar() {
             {/* User Info */}
             <div className="bg-white/10 rounded-lg p-3">
               <p className="text-xs text-blue-200 mb-1">Connecté en tant que</p>
-              <p className="text-sm font-semibold text-white truncate">Administrateur</p>
+              <p className="text-sm font-semibold text-white truncate" title={user?.email}>
+                  {user?.email || 'Chargement...'}
+              </p>
             </div>
 
             {/* Logout */}
@@ -298,7 +317,7 @@ export default function AdminNavbar() {
                 <X className="h-6 w-6 text-white" />
               </button>
             </div>
-            
+             
             {/* Contenu Sidebar Mobile (Copie de la desktop pour simplifier) */}
             <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
               <div className="flex-shrink-0 flex items-center px-4 text-white font-bold text-xl">
