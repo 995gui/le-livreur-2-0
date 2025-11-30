@@ -21,11 +21,11 @@ export default function ServicesPage() {
       title: 'Livraison Express',
       subtitle: 'Disponibilité en soirée, week-ends & jours fériés',
       description: 'Votre colis est prioritaire. Un livreur est dépêché immédiatement pour une course directe sans détours.',
-      longDescription: 'Le service Express est conçu pour les urgences absolues, les livraisons de nuit ou les week-ends. Votre commande passe avant toutes les autres avec une prise en charge immédiate.',
+      longDescription: 'Le service Express est conçu pour les urgences absolues, les livraisons de nuit, de week-ends et de jours fériés. Votre commande passe avant toutes les autres avec une prise en charge immédiate.',
       advantages: [
         'Prise en charge immédiate',
         'Livraison directe (Point A -> Point B)',
-        'Disponible soirs et week-ends',
+        'Disponible soirée, week-ends & jours fériés',
         'Priorité absolue sur la flotte',
         'Idéal pour repas chauds et documents urgents',
         'Traçabilité GPS temps réel'
