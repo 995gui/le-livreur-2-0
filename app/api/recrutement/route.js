@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { sendAdminNotification } from '@/lib/mail'; // Notre système d'email
 
 export async function POST(request) {
   try {
@@ -94,10 +95,18 @@ export async function POST(request) {
       );
     }
 
+    try {
+      console.log(data);
+      await sendAdminNotification('recrutement', data);
+    } catch (mailError) {
+      // On loggue l'erreur mais on ne bloque pas la réponse de succès pour le client
+      console.error("⚠️ Erreur envoi email notification:", mailError);
+    }
+
     return NextResponse.json(
       { 
         success: true, 
-        message: 'Candidature envoyée avec succès ! Nous vous contacterons sous 48h.',
+        message: 'Candidature envoyée avec succès !',
         data: {
           id: data.id,
           name: data.name

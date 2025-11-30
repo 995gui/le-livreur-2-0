@@ -1,7 +1,11 @@
 // Fichier: components/layout/Footer.jsx
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Phone, Mail, MapPin, Clock, Facebook, Instagram, Linkedin, Twitter, MessageCircle } from 'lucide-react';
+import DevisForm from '@/components/forms/DevisForm';
+import { Phone, Mail, MapPin, Clock, Facebook, Instagram, Linkedin, Twitter, MessageCircle, Package } from 'lucide-react';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -10,6 +14,7 @@ export default function Footer() {
   const phoneNumber = "01 47 04 28 15";
   const cleanPhone = "2290147042815";
   const email = "lelivreur2zero@gmail.com";
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const services = [
     { name: 'Livraison Express', href: '/services#express' },
@@ -230,14 +235,16 @@ export default function Footer() {
         >
           <MessageCircle className="w-6 h-6" />
         </a>
-        <a
-          href={`tel:+${cleanPhone}`}
-          className="bg-[#F4B223] hover:bg-[#D4920F] text-[#1B3A5F] p-4 rounded-full shadow-2xl transition-all transform hover:scale-110"
-          aria-label="Appeler"
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-[#F4B223] hover:bg-[#D4920F] text-[#1B3A5F] p-4 rounded-full shadow-2xl transition-all transform hover:scale-110 flex items-center justify-center font-bold"
+          aria-label="Commander"
+          title="Commander une livraison"
         >
-          <Phone className="w-6 h-6" />
-        </a>
+          <Package className="w-6 h-6" />
+        </button>
       </div>
+      <DevisForm open={isModalOpen} onOpenChange={setIsModalOpen} />
     </footer>
   );
 }

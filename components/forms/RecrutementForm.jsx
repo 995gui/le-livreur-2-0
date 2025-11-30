@@ -95,13 +95,6 @@ export default function RecrutementForm({ open, onOpenChange, isModal = true }) 
         
         if (isModal && onOpenChange) onOpenChange(false);
 
-        setTimeout(() => {
-          toast({
-            title: "Prochaine étape",
-            description: "Notre équipe RH vous contactera sous 48h pour la suite du processus.",
-          });
-        }, 3000);
-
       } else {
         toast({
           variant: "destructive",
@@ -122,7 +115,7 @@ export default function RecrutementForm({ open, onOpenChange, isModal = true }) 
     }
   };
 
-  const FormContent = () => (
+  const formContent = (
     <div className="space-y-6">
       <div className="grid w-full items-center gap-2">
         <Label htmlFor="name" className="text-base font-semibold">
@@ -246,7 +239,7 @@ export default function RecrutementForm({ open, onOpenChange, isModal = true }) 
   if (!isModal) {
     return (
       <form onSubmit={handleSubmit}>
-        <FormContent />
+        {formContent}
       </form>
     );
   }
@@ -265,7 +258,7 @@ export default function RecrutementForm({ open, onOpenChange, isModal = true }) 
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="py-4">
-          <FormContent />
+          {formContent}
         </form>
       </DialogContent>
     </Dialog>
