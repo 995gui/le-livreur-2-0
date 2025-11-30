@@ -52,12 +52,17 @@ export async function POST(request) {
 
     // 3. Envoi de la Notification Email à l'Admin
     // On utilise .catch() pour ne pas faire planter la requête si l'email échoue
-    sendAdminNotification('devis', {
-      name,
-      phone,
-      serviceType,
-      details
-    }).catch(err => console.error("⚠️ Erreur envoi email notification:", err));
+    try {
+      await sendAdminNotification('devis', {
+        name,
+        phone,
+        serviceType,
+        details
+      });
+    } catch (mailError) {
+      // On loggue l'erreur mais on ne bloque pas la réponse de succès pour le client
+      console.error("⚠️ Erreur envoi email notification:", mailError);
+    }
 
     // 4. Réponse succès au client
     return NextResponse.json(
