@@ -1,6 +1,6 @@
 // Fichier: app/api/send-email/route.js
 import { NextResponse } from 'next/server';
-import { sendCandidateEmail } from '@/lib/mail'; // On importe la nouvelle fonction
+import { sendAdminNotification } from '@/lib/mail'; // On importe la nouvelle fonction
 
 export async function POST(request) {
   try {
@@ -11,7 +11,7 @@ export async function POST(request) {
     }
 
     // Appel du helper centralisé
-    await sendCandidateEmail(to, subject, html);
+    await sendAdminNotification(to, subject, html);
 
     return NextResponse.json({ success: true });
   } catch (error) {
