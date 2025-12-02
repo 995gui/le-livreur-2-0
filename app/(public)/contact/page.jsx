@@ -19,15 +19,17 @@ export const metadata = {
 };
 
 // DONNÉES RÉELLES
-const phoneNumber1 = "01 47 04 28 15";
-const phoneNumber2 = "01 47 04 28 14";
-const cleanPhone1 = "2290147042815";
-const cleanPhone2 = "2290147042814";
-const displayPhones = "+229 01 47 04 28 15 / 14";
+const phoneNumber1 = "01 47 04 28 14";
+const phoneNumber2 = "01 47 04 28 15";
+const phoneLabel1 = "Service Commercial";
+const phoneLabel2 = "Support Client";
+const cleanPhone1 = "2290147042814";
+const cleanPhone2 = "2290147042815";
+const displayPhones = "+229 01 47 04 28 14 / 15";
 const email = "lelivreur2zero@gmail.com";
 const address = "9C86+3F, Cotonou";
 const addressDetails = "Ilot: 921, Quartier: Enagnon Sikè, Parcelle: C, Maison: HILAIRE AKPAGBE";
-const googleMapsLink = "https://maps.app.goo.gl/z5LLDHihdngCGELl5";
+const googleMapsLink = "https://www.google.com/maps/dir//9C86%2B3F,+Cotonou/@6.3723026,2.3961783,12z/data=!4m8!4m7!1m0!1m5!1m1!1s0x102355bc8599d61b:0x2561daa3961b6a1c!2m2!1d2.4111875!2d6.3651875?entry=ttu&g_ep=EgoyMDI1MTEyMy4xIKXMDSoASAFQAw%3D%3D";
 
 // RÉSEAUX SOCIAUX
 const socialLinks = {
@@ -96,7 +98,7 @@ const contactReasons = [
 const faqData = [
   {
     question: "Quel est le délai de livraison ?",
-    answer: "Nos délais varient selon la zone : Livraison Express (1-2h) dans Cotonou centre, Livraison Standard (3-6h) dans le Grand Cotonou. Pour les autres villes du Bénin, comptez 24-48h selon la destination."
+    answer: "Nos délais varient selon la zone : Livraison Express (30-45 minutes) dans Cotonou centre, Livraison Standard (3-6h) dans le Grand Cotonou. Pour les autres villes du Bénin, comptez 24-48h selon la destination."
   },
   {
     question: "Comment suivre mon colis ?",
@@ -227,12 +229,14 @@ export default function ContactPage() {
                                     href={item.href}
                                     className="flex-1 text-center text-sm bg-[#1B3A5F] text-white py-2 rounded-lg hover:bg-[#2C5282] transition-colors font-semibold"
                                   >
+                                    <div className="text-[10px] text-blue-300 mb-0.5">{phoneLabel1}</div>
                                     📞 {phoneNumber1}
                                   </a>
                                   <a 
                                     href={item.secondHref}
                                     className="flex-1 text-center text-sm bg-[#1B3A5F] text-white py-2 rounded-lg hover:bg-[#2C5282] transition-colors font-semibold"
                                   >
+                                    <div className="text-[10px] text-blue-300 mb-0.5">{phoneLabel2}</div>
                                     📞 {phoneNumber2}
                                   </a>
                                 </div>
@@ -270,6 +274,7 @@ export default function ContactPage() {
                     rel="noopener noreferrer"
                     className="block w-full bg-white text-green-600 font-bold text-center py-3 rounded-lg hover:bg-green-50 transition-colors shadow-sm"
                   >
+                    <div className="text-[10px] text-green-500 mb-0.5">{phoneLabel1}</div>
                     💬 WhatsApp {phoneNumber1}
                   </a>
                   <a 
@@ -278,6 +283,7 @@ export default function ContactPage() {
                     rel="noopener noreferrer"
                     className="block w-full bg-white text-green-600 font-bold text-center py-3 rounded-lg hover:bg-green-50 transition-colors shadow-sm"
                   >
+                    <div className="text-[10px] text-green-500 mb-0.5">{phoneLabel2}</div>
                     💬 WhatsApp {phoneNumber2}
                   </a>
                 </div>

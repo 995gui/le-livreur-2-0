@@ -62,8 +62,7 @@ export default function QuickIntro() {
             Notre Mission
           </h3>
           <p className="text-lg md:text-xl leading-relaxed opacity-90 mb-10 max-w-3xl mx-auto">
-            Révolutionner la logistique urbaine au Bénin avec une flotte de <strong className="text-[#F4B223]">motos électriques</strong>. 
-            Nous nous levons chaque matin pour garantir rapidité, sécurité et professionnalisme à chaque course.
+            Offrir un service de livraison rapide, fiable et durable, en combinant digitalisation et mobilité électrique pour faciliter le commerce local et améliorer la qualité de vie urbaine.
           </p>
           
           {/* Tags visuels */}

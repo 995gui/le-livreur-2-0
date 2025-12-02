@@ -6,8 +6,12 @@ import DevisForm from '@/components/forms/DevisForm';
 
 export default function Cta() {
   // VOS VRAIES COORDONNÉES
-  const phoneNumber = "+229 01 47 04 28 15"; // ⚠️ REMPLACEZ CECI PAR VOTRE VRAI NUMÉRO
-  const whatsappNumber = "2290147042815"; // ⚠️ FORMAT SANS LE '+' NI ESPACES
+  const phone1 = "+229 01 47 04 28 14";
+  const phone2 = "+229 01 47 04 28 15";
+  const phoneLabel1 = "Service Commercial";
+  const phoneLabel2 = "Support Client";
+  const whatsappNumber1 = "2290147042814";
+  const whatsappNumber2 = "2290147042815";
   const email = "lelivreur2zero@gmail.com";
   const [isDevisModalOpen, setIsDevisModalOpen] = useState(false);
 
@@ -15,24 +19,49 @@ export default function Cta() {
     {
       icon: <Phone className="w-6 h-6" />,
       title: "Téléphone",
-      value: phoneNumber,
-      action: "Appeler",
-      href: `tel:${phoneNumber.replace(/ /g, '')}`,
+      subtitle: "2 lignes disponibles",
+      phones: [
+        {
+          number: phone1,
+          label: phoneLabel1,
+          href: `tel:${phone1.replace(/\s/g, '')}`,
+          description: "Devis & Commandes"
+        },
+        {
+          number: phone2,
+          label: phoneLabel2,
+          href: `tel:${phone2.replace(/\s/g, '')}`,
+          description: "Suivi & Assistance"
+        }
+      ],
       color: "from-blue-500 to-blue-600"
     },
     {
       icon: <MessageCircle className="w-6 h-6" />,
       title: "WhatsApp",
-      value: "Discuter en direct",
-      action: "Ouvrir chat",
-      href: `https://wa.me/${whatsappNumber}`,
+      subtitle: "Chat instantané",
+      phones: [
+        {
+          number: phone1,
+          label: phoneLabel1,
+          href: `https://wa.me/${whatsappNumber1}?text=Bonjour%20LE%20LIVREUR%202.0`,
+          description: "Devis & Commandes"
+        },
+        {
+          number: phone2,
+          label: phoneLabel2,
+          href: `https://wa.me/${whatsappNumber2}?text=Bonjour%20LE%20LIVREUR%202.0`,
+          description: "Suivi & Assistance"
+        }
+      ],
       color: "from-green-500 to-green-600"
     },
     {
       icon: <Mail className="w-6 h-6" />,
       title: "Email",
+      subtitle: "Réponse sous 2h",
       value: email,
-      action: "Envoyer",
+      action: "Envoyer un email",
       href: `mailto:${email}`,
       color: "from-purple-500 to-purple-600"
     }
@@ -47,7 +76,6 @@ export default function Cta() {
     {
       icon: <Clock className="w-5 h-5" />,
       label: "Horaires d'ouverture",
-      // J'ai simplifié pour l'affichage : 09h-23h couvre la majorité
       value: "Lun - Dim : 09h00 - 23h00" 
     }
   ];
@@ -79,26 +107,67 @@ export default function Cta() {
         {/* Contact Methods */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           {contactMethods.map((method, index) => (
-            <a
+            <div
               key={index}
-              href={method.href}
-              target={index === 1 ? "_blank" : undefined} // WhatsApp dans nouvel onglet
-              rel={index === 1 ? "noopener noreferrer" : undefined}
-              className="group bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 hover:bg-white/20 transition-all duration-300 transform hover:scale-105"
+              className="group bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 hover:bg-white/20 transition-all duration-300"
             >
               <div className={`inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br ${method.color} text-white mb-4 group-hover:scale-110 transition-transform shadow-lg`}>
                 {method.icon}
               </div>
-              <h3 className="text-white font-bold text-xl mb-2">
+              <h3 className="text-white font-bold text-xl mb-1">
                 {method.title}
               </h3>
-              <p className="text-white/80 mb-4 text-sm truncate">
-                {method.value}
+              <p className="text-white/60 text-xs mb-4">
+                {method.subtitle}
               </p>
-              <button className="w-full bg-[#F4B223] text-[#1B3A5F] py-3 rounded-lg font-bold hover:bg-[#D4920F] transition-colors shadow-lg">
-                {method.action}
-              </button>
-            </a>
+
+              {/* Si c'est Email (pas de phones array) */}
+              {method.value ? (
+                <>
+                  <p className="text-white/80 mb-4 text-sm truncate">
+                    {method.value}
+                  </p>
+                  <a
+                    href={method.href}
+                    className="block w-full bg-[#F4B223] text-[#1B3A5F] py-3 rounded-lg font-bold hover:bg-[#D4920F] transition-colors shadow-lg text-center"
+                  >
+                    {method.action}
+                  </a>
+                </>
+              ) : (
+                /* Si c'est Téléphone ou WhatsApp avec 2 numéros */
+                <div className="space-y-3">
+                  {method.phones.map((phoneItem, phoneIndex) => (
+                    <a
+                      key={phoneIndex}
+                      href={phoneItem.href}
+                      target={method.title === "WhatsApp" ? "_blank" : undefined}
+                      rel={method.title === "WhatsApp" ? "noopener noreferrer" : undefined}
+                      className="block bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg p-3 transition-all group/phone"
+                    >
+                      <div className="flex items-start justify-between mb-1">
+                        <span className="text-[10px] text-white/50 font-bold uppercase tracking-wide">
+                          {phoneItem.label}
+                        </span>
+                        <span className="text-[10px] text-[#F4B223] font-semibold">
+                          {phoneItem.description}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-white font-bold text-sm group-hover/phone:text-[#F4B223] transition-colors">
+                          {phoneItem.number}
+                        </span>
+                        {method.title === "Téléphone" ? (
+                          <Phone className="w-4 h-4 text-white/40 group-hover/phone:text-[#F4B223] transition-colors" />
+                        ) : (
+                          <MessageCircle className="w-4 h-4 text-white/40 group-hover/phone:text-[#F4B223] transition-colors" />
+                        )}
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
         </div>
 
@@ -147,7 +216,7 @@ export default function Cta() {
             </div>
           </div>
 
-          {/* BOUTON DEVIS (Connecté à /tarifs#devis) */}
+          {/* BOUTON DEVIS */}
           <div className="bg-white rounded-2xl p-8 shadow-2xl flex flex-col items-center justify-center text-center">
             <h3 className="text-2xl font-bold text-[#1B3A5F] mb-4">
               Demande de Devis

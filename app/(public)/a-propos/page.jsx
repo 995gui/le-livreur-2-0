@@ -384,7 +384,7 @@ export default function AProposPage() {
         </div>
       </section>
 
-      {/* ========== VALEURS ========== */}
+      {/* ========== NOS 5 PILIERS ========== */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -392,40 +392,63 @@ export default function AProposPage() {
               Ce Qui Nous Anime
             </div>
             <h2 className="text-4xl font-bold text-[#1B3A5F] mb-4">
-              Nos 4 Piliers
+              Nos 5 Piliers
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               Des valeurs qui guident chacune de nos décisions et actions au quotidien
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {valeurs.map((valeur, idx) => (
-              <div 
-                key={idx} 
-                className="group relative bg-white p-6 md:p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all border-2 border-gray-100 hover:border-[#F4B223] overflow-hidden"
-              >
-                {/* Background gradient au hover */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${colorClasses[valeur.color]} opacity-0 group-hover:opacity-5 transition-opacity`}></div>
-                
-                <div className="relative z-10">
-                  <div className={`bg-gradient-to-r ${colorClasses[valeur.color]} w-16 h-16 rounded-xl flex items-center justify-center mb-5 text-white group-hover:scale-110 transition-transform shadow-lg`}>
-                    {valeur.icon}
-                  </div>
-                  <h3 className="text-xl font-bold text-[#1B3A5F] mb-3">
-                    {valeur.titre}
-                  </h3>
-                  <p className="text-sm text-gray-600 leading-relaxed mb-4">
-                    {valeur.desc}
-                  </p>
-                  <div className="pt-4 border-t border-gray-100">
-                    <p className="text-xs font-bold text-[#F4B223]">
-                      {valeur.stat}
+          {/* CORRECTION LIGNE UNIQUE :
+             - lg:grid-cols-5 : Force 5 colonnes sur PC.
+             - flex : Force l'alignement en ligne sur Mobile.
+             - scrollbar-hidden : Cache la barre de défilement.
+          */}
+          <div className="
+            flex lg:grid lg:grid-cols-5 gap-4 
+            overflow-x-auto lg:overflow-visible 
+            pb-4 px-2 -mx-4 sm:mx-0 lg:mx-0
+            [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]
+          ">
+            {valeurs.map((valeur, idx) => {
+              const bgClass = colorClasses[valeur.color] || "";
+              
+              return (
+                <div 
+                  key={idx} 
+                  className="
+                    group relative bg-white p-6 rounded-xl shadow-md border border-gray-100 
+                    hover:border-[#F4B223] hover:shadow-lg transition-all duration-300 overflow-hidden
+                    min-w-[260px] lg:min-w-0 flex-shrink-0
+                  "
+                >
+                  {/* Layer décorative */}
+                  <div aria-hidden="true" className={`absolute inset-0 bg-gradient-to-br ${bgClass} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                  
+                  <div className="relative z-10 h-full flex flex-col">
+                    {/* Icon */}
+                    <div className={`bg-gradient-to-r ${bgClass} w-10 h-10 rounded-lg flex items-center justify-center mb-3 text-white shadow-md transform transition-transform duration-300 group-hover:scale-110`}>
+                      {valeur.icon}
+                    </div>
+                    
+                    {/* Titre */}
+                    <h3 className="text-sm font-bold text-[#1B3A5F] mb-2 line-clamp-1">
+                      {valeur.titre}
+                    </h3>
+                    
+                    {/* Description */}
+                    <p className="text-xs text-gray-600 leading-snug mb-3 flex-grow line-clamp-3">
+                      {valeur.desc}
                     </p>
+                    
+                    {/* Statistique */}
+                    <div className="pt-2 border-t border-gray-100 mt-auto">
+                      <p className="text-[10px] font-bold text-[#F4B223]">{valeur.stat}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

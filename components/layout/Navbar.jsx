@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom'; // 1. Import pour la téléportation
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -15,18 +15,21 @@ export default function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [expandedMobile, setExpandedMobile] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // 2. État pour savoir si le composant est monté (nécessaire pour le Portal)
   const [mounted, setMounted] = useState(false);
   
   const pathname = usePathname();
 
   const companyInfo = {
-    phone: "01 47 04 28 15",
-    cleanPhone: "2290147042815",
+    phone1: "01 47 04 28 14",
+    phone2: "01 47 04 28 15",
+    phoneLabel1: "Service Commercial",
+    phoneLabel2: "Support Client",
+    cleanPhone1: "2290147042814",
+    cleanPhone2: "2290147042815",
   };
 
   useEffect(() => {
-    setMounted(true); // On confirme que le client est prêt
+    setMounted(true);
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
@@ -34,7 +37,6 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Bloquer le scroll quand le menu est ouvert
   useEffect(() => {
     if (isMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -177,17 +179,70 @@ export default function Navbar() {
 
             {/* CTA Buttons Desktop */}
             <div className="hidden lg:flex items-center space-x-4">
-              <a
-                href={`tel:+${companyInfo.cleanPhone}`}
-                className={`flex items-center px-4 py-2 rounded-lg font-semibold transition-all ${
-                  isScrolled
-                    ? 'text-[#1B3A5F] hover:bg-gray-100'
-                    : 'text-white hover:bg-white/10'
-                }`}
+              {/* Dropdown Téléphone */}
+              <div 
+                className="relative"
+                onMouseEnter={() => setActiveDropdown('phone')}
+                onMouseLeave={() => setActiveDropdown(null)}
               >
-                <Phone className="w-4 h-4 mr-2" />
-                <span className="hidden xl:inline">{companyInfo.phone}</span>
-              </a>
+                <button
+                  className={`flex items-center px-4 py-2 rounded-lg font-semibold transition-all ${
+                    isScrolled
+                      ? 'text-[#1B3A5F] hover:bg-gray-100'
+                      : 'text-white hover:bg-white/10'
+                  }`}
+                >
+                  <Phone className="w-4 h-4 mr-2" />
+                  <span className="hidden xl:inline">Nous appeler</span>
+                  <ChevronDown className={`ml-1 w-4 h-4 transition-transform duration-300 ${activeDropdown === 'phone' ? 'rotate-180' : ''}`} />
+                </button>
+
+                {activeDropdown === 'phone' && (
+                  <div className="absolute top-full right-0 w-64 pt-4 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                    <div className="absolute top-2 right-6 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-100"></div>
+                    
+                    <div className="bg-white rounded-xl shadow-2xl py-2 border border-gray-100 overflow-hidden">
+                      {/* Numéro 1 - Service Commercial */}
+                      <a
+                        href={`tel:+${companyInfo.cleanPhone1}`}
+                        className="flex flex-col px-5 py-3 hover:bg-gray-50 transition-colors group/item border-l-4 border-transparent hover:border-[#F4B223]"
+                        onClick={() => setActiveDropdown(null)}
+                      >
+                        <span className="text-xs text-gray-500 font-bold uppercase tracking-wide mb-0.5">
+                          {companyInfo.phoneLabel1}
+                        </span>
+                        <span className="font-bold text-[#1B3A5F] text-base group-hover/item:text-[#F4B223] transition-colors flex items-center gap-2">
+                          <Phone className="w-4 h-4" />
+                          {companyInfo.phone1}
+                        </span>
+                        <span className="text-xs text-gray-400 mt-1 font-medium">
+                          Devis, tarifs, partenariats
+                        </span>
+                      </a>
+
+                      <div className="h-px bg-gray-100 mx-4"></div>
+
+                      {/* Numéro 2 - Support Client */}
+                      <a
+                        href={`tel:+${companyInfo.cleanPhone2}`}
+                        className="flex flex-col px-5 py-3 hover:bg-gray-50 transition-colors group/item border-l-4 border-transparent hover:border-[#F4B223]"
+                        onClick={() => setActiveDropdown(null)}
+                      >
+                        <span className="text-xs text-gray-500 font-bold uppercase tracking-wide mb-0.5">
+                          {companyInfo.phoneLabel2}
+                        </span>
+                        <span className="font-bold text-[#1B3A5F] text-base group-hover/item:text-[#F4B223] transition-colors flex items-center gap-2">
+                          <Phone className="w-4 h-4" />
+                          {companyInfo.phone2}
+                        </span>
+                        <span className="text-xs text-gray-400 mt-1 font-medium">
+                          Suivi, réclamations, assistance
+                        </span>
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
               
               <button
                 onClick={() => setIsModalOpen(true)} 
@@ -213,9 +268,7 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* 3. LE MENU MOBILE "TÉLÉPORTÉ" (PORTAL)
-          Cela garantit qu'il est au-dessus de tout le reste, hors du header, sans conflit de scroll.
-      */}
+      {/* MENU MOBILE */}
       {mounted && isMenuOpen && createPortal(
         <div className="lg:hidden fixed inset-0 z-[9999] bg-white flex flex-col animate-in slide-in-from-right duration-300">
            
@@ -292,25 +345,48 @@ export default function Navbar() {
               })}
            </div>
 
-           {/* Footer Mobile Fixe */}
+           {/* Footer Mobile Fixe - AVEC LES 2 NUMÉROS */}
            <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100 bg-white pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                {/* Service Commercial */}
+                <a
+                   href={`tel:+${companyInfo.cleanPhone1}`}
+                   className="flex flex-col items-center justify-center bg-[#1B3A5F] text-white py-3 rounded-xl font-bold shadow-lg active:scale-95 transition-transform"
+                >
+                   <Phone className="w-5 h-5 mb-1" />
+                   <span className="text-xs opacity-80">{companyInfo.phoneLabel1}</span>
+                   <span className="text-sm">{companyInfo.phone1}</span>
+                </a>
+                
+                {/* Support Client */}
+                <a
+                   href={`tel:+${companyInfo.cleanPhone2}`}
+                   className="flex flex-col items-center justify-center bg-[#2C5282] text-white py-3 rounded-xl font-bold shadow-lg active:scale-95 transition-transform"
+                >
+                   <Phone className="w-5 h-5 mb-1" />
+                   <span className="text-xs opacity-80">{companyInfo.phoneLabel2}</span>
+                   <span className="text-sm">{companyInfo.phone2}</span>
+                </a>
+              </div>
+              
+              {/* WhatsApp Buttons */}
               <div className="grid grid-cols-2 gap-3">
                 <a
-                   href={`tel:+${companyInfo.cleanPhone}`}
-                   className="flex items-center justify-center w-full bg-[#1B3A5F] text-white py-3.5 rounded-xl font-bold shadow-lg active:scale-95 transition-transform"
+                   href={`https://wa.me/${companyInfo.cleanPhone1}?text=Bonjour`}
+                   className="flex items-center justify-center bg-[#25D366] text-white py-2.5 rounded-xl font-bold shadow-lg active:scale-95 transition-transform text-sm"
                 >
-                   <Phone className="w-5 h-5 mr-2" /> Appeler
+                   <MessageCircle className="w-4 h-4 mr-1.5" /> WA {companyInfo.phoneLabel1.split(' ')[1]}
                 </a>
                 <a
-                   href={`https://wa.me/${companyInfo.cleanPhone}?text=Bonjour`}
-                   className="flex items-center justify-center w-full bg-[#25D366] text-white py-3.5 rounded-xl font-bold shadow-lg active:scale-95 transition-transform"
+                   href={`https://wa.me/${companyInfo.cleanPhone2}?text=Bonjour`}
+                   className="flex items-center justify-center bg-[#25D366] text-white py-2.5 rounded-xl font-bold shadow-lg active:scale-95 transition-transform text-sm"
                 >
-                   <MessageCircle className="w-5 h-5 mr-2" /> WhatsApp
+                   <MessageCircle className="w-4 h-4 mr-1.5" /> WA {companyInfo.phoneLabel2.split(' ')[1]}
                 </a>
               </div>
            </div>
         </div>,
-        document.body // Cible du portail : Le <body>
+        document.body
       )}
 
       <DevisForm open={isModalOpen} onOpenChange={setIsModalOpen} />
